@@ -1,4 +1,5 @@
-<div class="w-full p-1 md:p-1 lg:p-1 pb-16">
+            
+            <div class="w-full p-1 md:p-1 lg:p-1 pb-16">
             
             <!-- HEADER HERO CONTAINER -->
             <div class="bg-gradient-to-r from-blue-900 via-indigo-950 to-[#0a1324] border border-blue-800/50 rounded-xl p-6 mb-6 flex flex-col sm:flex-row items-center justify-between shadow-lg relative overflow-hidden shrink-0">
@@ -307,6 +308,8 @@
             </div>
         </div>
 
+        <!-- SCRIPTS & PDF/EXCEL EXPORT LOGIC -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 if (typeof lucide !== 'undefined') lucide.createIcons();

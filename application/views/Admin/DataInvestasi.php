@@ -346,9 +346,9 @@
                 const workbook = new window.ExcelJS.Workbook();
                 const worksheet = workbook.addWorksheet('Data Investasi');
                 
-                // Kolom: NO, NAMA PERUSAHAAN, NIB, NILAI PMDN (RP), NILAI PMA (RP), TK LOKAL, TK ASING, TOTAL TK (Total 8 Kolom)
-                const totalCols = 8; 
-                const lastColLetter = 'H';
+                // Kolom ditambah 1 untuk Total Investasi (Total 9 Kolom)
+                const totalCols = 9; 
+                const lastColLetter = 'I';
 
                 // KOP SURAT
                 worksheet.addRow(['PEMERINTAH KABUPATEN MIMIKA']);
@@ -386,19 +386,20 @@
 
                 worksheet.addRow([]); 
 
-                // Header Tabel
-                let headers = ['NO', 'NAMA PERUSAHAAN', 'NIB', 'NILAI PMDN (RP)', 'NILAI PMA (RP)', 'TK LOKAL', 'TK ASING', 'TOTAL TK'];
+                // Header Tabel (Ditambahkan TOTAL INVESTASI)
+                let headers = ['NO', 'NAMA PERUSAHAAN', 'NIB', 'NILAI PMDN (RP)', 'NILAI PMA (RP)', 'TOTAL INVESTASI (RP)', 'TK LOKAL', 'TK ASING', 'TOTAL TK'];
                 const headerRow = worksheet.addRow(headers);
                 
                 headerRow.eachCell((cell) => {
                     cell.font = { name: 'Arial', size: 10, bold: true };
-                    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
                     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF92CDDC' } };
                     cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
                 });
 
                 let sumNilaiPMDN = 0;
                 let sumNilaiPMA = 0;
+                let sumTotalInvestasi = 0;
                 let sumTkLokal = 0;
                 let sumTkAsing = 0;
 
@@ -407,12 +408,15 @@
                     dataInvestasiExport.forEach((item, index) => {
                         const nilaiPMDN = parseFloat(item.NilaiInvestasiPMDN) || 0;
                         const nilaiPMA = parseFloat(item.NilaiInvestasiPMA) || 0;
+                        const totalInvestasi = nilaiPMDN + nilaiPMA;
+                        
                         const tkLokal = parseInt(item.TenagaKerjaLokal) || 0;
                         const tkAsing = parseInt(item.TenagaKerjaAsing) || 0;
                         const totalTk = tkLokal + tkAsing;
 
                         sumNilaiPMDN += nilaiPMDN;
                         sumNilaiPMA += nilaiPMA;
+                        sumTotalInvestasi += totalInvestasi;
                         sumTkLokal += tkLokal;
                         sumTkAsing += tkAsing;
 
@@ -422,6 +426,7 @@
                             (item.NIB || '-'), 
                             nilaiPMDN, 
                             nilaiPMA, 
+                            totalInvestasi,
                             tkLokal, 
                             tkAsing, 
                             totalTk
@@ -433,10 +438,10 @@
                             cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
                             if (colNumber === 1 || colNumber === 3) { 
                                 cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                            } else if (colNumber === 4 || colNumber === 5) { // Nilai PMDN dan PMA
+                            } else if (colNumber === 4 || colNumber === 5 || colNumber === 6) { // Nilai PMDN, PMA, TOTAL INVESTASI
                                 cell.alignment = { vertical: 'middle', horizontal: 'right' };
                                 cell.numFmt = '#,##0';
-                            } else if (colNumber >= 6) { // TK
+                            } else if (colNumber >= 7) { // TK
                                 cell.alignment = { vertical: 'middle', horizontal: 'center' };
                                 cell.numFmt = '#,##0';
                             } else { 
@@ -446,7 +451,7 @@
                     });
 
                     // Row Total Summary (Merge A s.d C)
-                    const totalRowData = ['TOTAL REKAPITULASI', '', '', sumNilaiPMDN, sumNilaiPMA, sumTkLokal, sumTkAsing, (sumTkLokal + sumTkAsing)];
+                    const totalRowData = ['TOTAL REKAPITULASI', '', '', sumNilaiPMDN, sumNilaiPMA, sumTotalInvestasi, sumTkLokal, sumTkAsing, (sumTkLokal + sumTkAsing)];
                     const totalRow = worksheet.addRow(totalRowData);
                     worksheet.mergeCells(`A${totalRow.number}:C${totalRow.number}`);
 
@@ -455,13 +460,13 @@
                         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCE6F1' } };
                         cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
                         if (colNumber === 1) cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                        else if (colNumber === 4 || colNumber === 5) { cell.alignment = { vertical: 'middle', horizontal: 'right' }; cell.numFmt = '#,##0'; }
+                        else if (colNumber === 4 || colNumber === 5 || colNumber === 6) { cell.alignment = { vertical: 'middle', horizontal: 'right' }; cell.numFmt = '#,##0'; }
                         else cell.alignment = { vertical: 'middle', horizontal: 'center' };
                     });
 
                 } else {
-                    const emptyRow = worksheet.addRow(['Belum ada data rekap investasi.', '', '', '', '', '', '', '']);
-                    worksheet.mergeCells(`A${emptyRow.number}:H${emptyRow.number}`);
+                    const emptyRow = worksheet.addRow(['Belum ada data rekap investasi.', '', '', '', '', '', '', '', '']);
+                    worksheet.mergeCells(`A${emptyRow.number}:I${emptyRow.number}`);
                     emptyRow.getCell(1).alignment = { horizontal: 'center' };
                 }
 
@@ -470,7 +475,7 @@
                 // Tanda Tangan
                 const now = new Date();
                 const dateStr = `${now.getDate()} ${monthNamesIndo[now.getMonth()]} ${now.getFullYear()}`;
-                const sigStartCol = 6; 
+                const sigStartCol = 7; 
                 
                 const addSigLine = (text, bold = false) => {
                     const row = worksheet.addRow([]);
@@ -493,8 +498,8 @@
 
                 // Lebar Kolom Excel
                 worksheet.columns = [
-                    { width: 6 },  { width: 35 }, { width: 20 }, 
-                    { width: 22 }, { width: 22 }, { width: 14 }, { width: 14 }, { width: 14 }
+                    { width: 6 },  { width: 35 }, { width: 15 }, 
+                    { width: 22 }, { width: 22 }, { width: 22 }, { width: 12 }, { width: 12 }, { width: 12 }
                 ];
                 worksheet.getRow(1).height = 25; worksheet.getRow(2).height = 20;
 
@@ -559,12 +564,13 @@
                     const titleText = `REKAPITULASI DATA INVESTASI DAN TENAGA KERJA TAHUN ${currentTahunFilter}`;
                     doc.text(titleText, 148, 47, { align: "center" });
                     
-                    // DATA TABEL 
-                    let tableHeaders = ['NO', 'NAMA PERUSAHAAN', 'NIB', 'NILAI PMDN (RP)', 'NILAI PMA (RP)', 'TK LOKAL', 'TK ASING', 'TOTAL TK'];
+                    // DATA TABEL (Ditambahkan TOTAL INVESTASI)
+                    let tableHeaders = ['NO', 'NAMA PERUSAHAAN', 'NIB', 'NILAI PMDN (RP)', 'NILAI PMA (RP)', 'TOTAL INVESTASI (RP)', 'TK LOKAL', 'TK ASING', 'TOTAL TK'];
                     let tableBody = [];
 
                     let sumNilaiPMDN = 0;
                     let sumNilaiPMA = 0;
+                    let sumTotalInvestasi = 0;
                     let sumTkLokal = 0;
                     let sumTkAsing = 0;
 
@@ -572,12 +578,15 @@
                         dataInvestasiExport.forEach((item, index) => {
                             const nilaiPMDN = parseFloat(item.NilaiInvestasiPMDN) || 0;
                             const nilaiPMA = parseFloat(item.NilaiInvestasiPMA) || 0;
+                            const totalInvestasi = nilaiPMDN + nilaiPMA;
+
                             const tkLokal = parseInt(item.TenagaKerjaLokal) || 0;
                             const tkAsing = parseInt(item.TenagaKerjaAsing) || 0;
                             const totalTk = tkLokal + tkAsing;
 
                             sumNilaiPMDN += nilaiPMDN;
                             sumNilaiPMA += nilaiPMA;
+                            sumTotalInvestasi += totalInvestasi;
                             sumTkLokal += tkLokal;
                             sumTkAsing += tkAsing;
 
@@ -587,6 +596,7 @@
                                 (item.NIB || '-'),
                                 'Rp ' + nilaiPMDN.toLocaleString('id-ID'),
                                 'Rp ' + nilaiPMA.toLocaleString('id-ID'),
+                                'Rp ' + totalInvestasi.toLocaleString('id-ID'),
                                 tkLokal.toLocaleString('id-ID'),
                                 tkAsing.toLocaleString('id-ID'),
                                 totalTk.toLocaleString('id-ID')
@@ -598,13 +608,14 @@
                             { content: 'TOTAL REKAPITULASI', colSpan: 3, styles: { halign: 'center', fontStyle: 'bold' } },
                             { content: 'Rp ' + sumNilaiPMDN.toLocaleString('id-ID'), styles: { halign: 'right', fontStyle: 'bold' } },
                             { content: 'Rp ' + sumNilaiPMA.toLocaleString('id-ID'), styles: { halign: 'right', fontStyle: 'bold' } },
+                            { content: 'Rp ' + sumTotalInvestasi.toLocaleString('id-ID'), styles: { halign: 'right', fontStyle: 'bold' } },
                             { content: sumTkLokal.toLocaleString('id-ID'), styles: { halign: 'center', fontStyle: 'bold' } },
                             { content: sumTkAsing.toLocaleString('id-ID'), styles: { halign: 'center', fontStyle: 'bold' } },
                             { content: (sumTkLokal + sumTkAsing).toLocaleString('id-ID'), styles: { halign: 'center', fontStyle: 'bold' } }
                         ]);
 
                     } else {
-                        tableBody.push([{ content: 'Belum ada data rekap investasi.', colSpan: 8, styles: { halign: 'center' } }]);
+                        tableBody.push([{ content: 'Belum ada data rekap investasi.', colSpan: 9, styles: { halign: 'center' } }]);
                     }
 
                     doc.autoTable({
@@ -612,17 +623,18 @@
                         head: [tableHeaders], 
                         body: tableBody, 
                         theme: 'grid',
-                        headStyles: { fillColor: [146, 205, 220], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center', valign: 'middle', lineWidth: 0.2, lineColor: [0, 0, 0], fontSize: 8 },
-                        bodyStyles: { textColor: [0, 0, 0], lineWidth: 0.2, lineColor: [0, 0, 0], fontSize: 8 },
+                        headStyles: { fillColor: [146, 205, 220], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center', valign: 'middle', lineWidth: 0.2, lineColor: [0, 0, 0], fontSize: 7 },
+                        bodyStyles: { textColor: [0, 0, 0], lineWidth: 0.2, lineColor: [0, 0, 0], fontSize: 7 },
                         columnStyles: { 
-                            0: { halign: 'center', cellWidth: 10 }, 
+                            0: { halign: 'center', cellWidth: 8 }, 
                             1: { halign: 'left' },
-                            2: { halign: 'center', cellWidth: 35 }, 
-                            3: { halign: 'right', cellWidth: 35 },
-                            4: { halign: 'right', cellWidth: 35 },
-                            5: { halign: 'center' },
-                            6: { halign: 'center' },
-                            7: { halign: 'center' }
+                            2: { halign: 'center', cellWidth: 25 }, 
+                            3: { halign: 'right', cellWidth: 28 },
+                            4: { halign: 'right', cellWidth: 28 },
+                            5: { halign: 'right', cellWidth: 28 },
+                            6: { halign: 'center', cellWidth: 15 },
+                            7: { halign: 'center', cellWidth: 15 },
+                            8: { halign: 'center', cellWidth: 15 }
                         },
                         margin: { top: 15, right: 15, bottom: 20, left: 15 }
                     });

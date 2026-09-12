@@ -187,8 +187,8 @@
                 }
                 ?>
 
-                <!-- ROW 2 KIRI: KPI CARDS (5 Cards Dinamis) -->
-                <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                <!-- ROW 2 KIRI: KPI CARDS (4 Cards Dinamis dengan PMDN & PMA digabung) -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <!-- KPI 1 -->
                     <div class="bg-[#082255] border border-[#12367a] rounded-lg px-3 py-2 flex items-center gap-3">
                         <i data-lucide="users" class="w-10 h-10 text-blue-300 shrink-0"></i>
@@ -211,29 +211,19 @@
                             </div>
                         </div>
                     </div>
-                    <!-- KPI 3 -->
+                    <!-- KPI 3 (Total Investasi PMDN + PMA) -->
+                    <?php $total_investasi_gabungan = $kpi['investasi_pmdn'] + $kpi['investasi_pma']; ?>
                     <div class="bg-[#6b4700] border border-[#946400] rounded-lg px-3 py-2 flex items-center gap-3">
                         <i data-lucide="coins" class="w-10 h-10 text-yellow-300 shrink-0"></i>
                         <div class="min-w-0">
-                            <div class="text-[8px] xl:text-[9px] whitespace-nowrap font-semibold text-yellow-200 uppercase tracking-wider mb-0.5 leading-tight">Investasi (PMDN)</div>
-                            <div class="text-xl 2xl:text-2xl font-bold text-white leading-none mb-1 whitespace-nowrap"><?= format_rupiah_short_val($kpi['investasi_pmdn']) ?></div>
+                            <div class="text-[8px] xl:text-[9px] whitespace-nowrap font-semibold text-yellow-200 uppercase tracking-wider mb-0.5 leading-tight">Total Investasi (PMDN & PMA)</div>
+                            <div class="text-xl 2xl:text-2xl font-bold text-white leading-none mb-1 whitespace-nowrap"><?= format_rupiah_short_val($total_investasi_gabungan) ?></div>
                             <div class="text-[9px] text-emerald-400 flex items-center gap-1 font-medium whitespace-nowrap">
-                                <i data-lucide="trending-up" class="w-3 h-3"></i> Realisasi
+                                <i data-lucide="trending-up" class="w-3 h-3"></i> Realisasi Gabungan
                             </div>
                         </div>
                     </div>
-                    <!-- KPI 4 -->
-                    <div class="bg-[#2d1b5a] border border-[#482888] rounded-lg px-3 py-2 flex items-center gap-3">
-                        <i data-lucide="bar-chart-3" class="w-10 h-10 text-purple-300 shrink-0"></i>
-                        <div class="min-w-0">
-                            <div class="text-[8px] xl:text-[9px] whitespace-nowrap font-semibold text-purple-200 uppercase tracking-wider mb-0.5 leading-tight">Investasi (PMA)</div>
-                            <div class="text-xl 2xl:text-2xl font-bold text-white leading-none mb-1 whitespace-nowrap"><?= format_rupiah_short_val($kpi['investasi_pma']) ?></div>
-                            <div class="text-[9px] text-emerald-400 flex items-center gap-1 font-medium whitespace-nowrap">
-                                <i data-lucide="trending-up" class="w-3 h-3"></i> Realisasi
-                            </div>
-                        </div>
-                    </div>
-                    <!-- KPI 5 -->
+                    <!-- KPI 4 (Tenaga Kerja) -->
                     <div class="bg-[#054955] border border-[#086a7a] rounded-lg px-3 py-2 flex items-center gap-3">
                         <i data-lucide="briefcase" class="w-10 h-10 text-teal-300 shrink-0"></i>
                         <div class="min-w-0">
@@ -566,33 +556,31 @@
                 $pct_pma = $grand_tot > 0 ? round(($tot_pma / $grand_tot) * 100, 1) : 0;
                 ?>
 
-                <div class="flex-1 flex flex-col justify-center gap-5 px-1">
-                    <!-- PMDN Bar -->
+                <div class="flex-1 flex flex-col justify-center gap-8 px-1">
+                    <!-- PMDN Bar (Teks realisasi dihapus) -->
                     <div>
-                        <div class="flex justify-between items-end mb-1">
+                        <div class="flex justify-between items-end mb-1.5">
                             <span class="text-[10px] text-yellow-400 font-semibold flex items-center gap-1">
-                                <i data-lucide="coins" class="w-3.5 h-3.5"></i> PMDN
+                                <i data-lucide="coins" class="w-4 h-4"></i> PMDN
                             </span>
                             <span class="text-white text-xs font-bold"><?= $pct_pmdn ?>%</span>
                         </div>
-                        <div class="w-full h-2.5 bg-[#1e2d4a] rounded-full overflow-hidden">
+                        <div class="w-full h-3 bg-[#1e2d4a] rounded-full overflow-hidden">
                             <div class="h-full bg-yellow-500 rounded-full transition-all duration-1000" style="width: <?= $pct_pmdn ?>%"></div>
                         </div>
-                        <div class="text-[9px] text-slate-400 mt-1.5 text-right font-medium">Realisasi: <?= format_rupiah_short_val($tot_pmdn) ?></div>
                     </div>
                     
-                    <!-- PMA Bar -->
+                    <!-- PMA Bar (Teks realisasi dihapus) -->
                     <div>
-                        <div class="flex justify-between items-end mb-1">
+                        <div class="flex justify-between items-end mb-1.5">
                             <span class="text-[10px] text-purple-400 font-semibold flex items-center gap-1">
-                                <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i> PMA
+                                <i data-lucide="bar-chart-3" class="w-4 h-4"></i> PMA
                             </span>
                             <span class="text-white text-xs font-bold"><?= $pct_pma ?>%</span>
                         </div>
-                        <div class="w-full h-2.5 bg-[#1e2d4a] rounded-full overflow-hidden">
+                        <div class="w-full h-3 bg-[#1e2d4a] rounded-full overflow-hidden">
                             <div class="h-full bg-purple-500 rounded-full transition-all duration-1000" style="width: <?= $pct_pma ?>%"></div>
                         </div>
-                        <div class="text-[9px] text-slate-400 mt-1.5 text-right font-medium">Realisasi: <?= format_rupiah_short_val($tot_pma) ?></div>
                     </div>
                 </div>
             </div>
