@@ -6,8 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SINTAMIKA Dashboard - Mimika</title>
     
+    <!-- Favicon standar untuk sebagian besar browser modern -->
+    <link rel="icon" type="image/jpeg" href="https://upload.wikimedia.org/wikipedia/commons/1/10/Lambang_Kabupaten_Mimika.jpg">
+    
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
     <!-- ApexCharts untuk Grafik -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -251,7 +254,7 @@
                         <div class="mb-3 flex justify-between items-start">
                             <div>
                                 <h3 class="text-[12px] font-semibold text-white uppercase tracking-wide">Infografis Sebaran Investasi</h3>
-                                <p class="text-[10px] text-slate-400">Peta distribusi (Heatmap Grid) di 18 Distrik Mimika</p>
+                                <p class="text-[10px] text-slate-400">Peta distribusi (Heatmap Grid) di Distrik Mimika</p>
                             </div>
                             <!-- Legend Singkat -->
                             <div class="flex items-center gap-1.5 text-[8px] text-slate-400 bg-[#061022] px-2 py-1 rounded border border-[#1e2d4a]">
@@ -262,7 +265,7 @@
                             </div>
                         </div>
                         
-                        <!-- Grid 18 Distrik Dinamis -->
+                        <!-- Grid Distrik Dinamis -->
                         <div class="flex-1 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2.5 overflow-y-auto pb-2 pr-1">
                             <?php 
                             if (!empty($heatmap)) {
@@ -300,7 +303,7 @@
                                         $color = 'from-[#10b981]/30 to-[#10b981]/5'; $border = 'border-[#10b981]/60'; $text = 'text-[#10b981]';
                                     }
                             ?>
-                            <div class="district-card relative bg-gradient-to-br <?= $color ?> border <?= $border ?> rounded-lg p-2.5 flex flex-col justify-center items-center cursor-pointer group overflow-hidden">
+                            <div class="district-card relative bg-gradient-to-br <?= $color ?> border <?= $border ?> rounded-lg p-2 flex flex-col justify-center items-center cursor-pointer group overflow-hidden">
                                 <div class="text-[9px] text-slate-300 font-medium text-center line-clamp-2 leading-tight mb-1 group-hover:text-white transition-colors h-6 flex items-center"><?= $cell['NamaDistrik'] ?></div>
                                 <div class="text-sm font-bold <?= $text ?>"><?= $displayVal ?></div>
                                 <div class="text-[7px] text-slate-500 uppercase tracking-widest mt-0.5"><?= $unitText ?></div>

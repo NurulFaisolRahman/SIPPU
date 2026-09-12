@@ -6,8 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($title) ? $title : 'Admin Dashboard - SINTAMIKA Mimika' ?></title>
     
+    <!-- Favicon standar untuk sebagian besar browser modern -->
+    <link rel="icon" type="image/jpeg" href="https://upload.wikimedia.org/wikipedia/commons/1/10/Lambang_Kabupaten_Mimika.jpg">
+    
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest" crossorigin="anonymous"></script>

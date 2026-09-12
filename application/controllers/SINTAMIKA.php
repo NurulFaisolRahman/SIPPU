@@ -54,49 +54,52 @@ class SINTAMIKA extends CI_Controller {
     private function _get_tahun_options() {
         $query = $this->db->query("
             SELECT DISTINCT Tahun FROM (
-                SELECT Tahun FROM profilusaha WHERE DeleteAt IS NULL
+                SELECT Tahun FROM ProfilUsaha WHERE DeleteAt IS NULL
                 UNION
-                SELECT Tahun FROM datainvestasi WHERE DeleteAt IS NULL
+                SELECT Tahun FROM DataInvestasi WHERE DeleteAt IS NULL
                 UNION
-                SELECT Tahun FROM rekapizinbulan WHERE DeleteAt IS NULL
+                SELECT Tahun FROM RekapIzinBulan WHERE DeleteAt IS NULL
                 UNION
-                SELECT Tahun FROM rekapmppbulan WHERE DeleteAt IS NULL
+                SELECT Tahun FROM RekapMppBulan WHERE DeleteAt IS NULL
             ) t ORDER BY Tahun DESC
         ");
         return $query->result_array();
     }
 
-    // 2. Ambil daftar distrik
+    // 2. Ambil daftar distrik HANYA untuk Kabupaten Mimika
+    // Kode Kemendagri Mimika Lama: 91.09, Baru (Papua Tengah): 94.04
+    // Level Distrik memiliki panjang 8 karakter (XX.XX.XX)
     private function _get_all_distrik() {
-        return $this->db->get('distrik')->result_array();
+        $this->db->where('(id LIKE "91.09.%" OR id LIKE "94.04.%")');
+        $this->db->where('CHAR_LENGTH(id)', 8);
+        $this->db->order_by('id', 'ASC');
+        return $this->db->get('Distrik')->result_array();
     }
 
     // 3. Ringkasan KPI Cards
     private function _get_kpi_summary($tahun = null, $id_distrik = null) {
-        // Condition for profilusaha
         $where_pu = "WHERE pu.DeleteAt IS NULL";
         if (!empty($tahun)) $where_pu .= " AND pu.Tahun = ".$this->db->escape($tahun);
         if (!empty($id_distrik)) $where_pu .= " AND pu.id_distrik = ".$this->db->escape($id_distrik);
 
-        // Condition for datainvestasi
         $where_di = "WHERE di.DeleteAt IS NULL AND pu.DeleteAt IS NULL";
         if (!empty($tahun)) $where_di .= " AND di.Tahun = ".$this->db->escape($tahun);
         if (!empty($id_distrik)) $where_di .= " AND pu.id_distrik = ".$this->db->escape($id_distrik);
 
         // Total Pelaku Usaha
-        $total_pu = $this->db->query("SELECT COUNT(pu.id) as total FROM profilusaha pu $where_pu")->row()->total ?? 0;
+        $total_pu = $this->db->query("SELECT COUNT(pu.id) as total FROM ProfilUsaha pu $where_pu")->row()->total ?? 0;
 
         // NIB Aktif
-        $nib_aktif = $this->db->query("SELECT COUNT(DISTINCT pu.NIB) as total FROM profilusaha pu $where_pu AND pu.NIB IS NOT NULL AND pu.NIB != ''")->row()->total ?? 0;
+        $nib_aktif = $this->db->query("SELECT COUNT(DISTINCT pu.NIB) as total FROM ProfilUsaha pu $where_pu AND pu.NIB IS NOT NULL AND pu.NIB != ''")->row()->total ?? 0;
 
-        // Investasi PMDN
-        $pmdn = $this->db->query("SELECT COALESCE(SUM(di.NilaiInvestasi), 0) as total FROM datainvestasi di JOIN profilusaha pu ON di.id_profil = pu.id $where_di AND di.JenisInvestasi = 'PMDN'")->row()->total ?? 0;
+        // Investasi PMDN (Kolom Baru)
+        $pmdn = $this->db->query("SELECT COALESCE(SUM(di.NilaiInvestasiPMDN), 0) as total FROM DataInvestasi di JOIN ProfilUsaha pu ON di.id_profil = pu.id $where_di")->row()->total ?? 0;
 
-        // Investasi PMA
-        $pma = $this->db->query("SELECT COALESCE(SUM(di.NilaiInvestasi), 0) as total FROM datainvestasi di JOIN profilusaha pu ON di.id_profil = pu.id $where_di AND di.JenisInvestasi = 'PMA'")->row()->total ?? 0;
+        // Investasi PMA (Kolom Baru)
+        $pma = $this->db->query("SELECT COALESCE(SUM(di.NilaiInvestasiPMA), 0) as total FROM DataInvestasi di JOIN ProfilUsaha pu ON di.id_profil = pu.id $where_di")->row()->total ?? 0;
 
         // Total Tenaga Kerja
-        $tk = $this->db->query("SELECT COALESCE(SUM(di.TenagaKerjaLokal + di.TenagaKerjaAsing), 0) as total FROM datainvestasi di JOIN profilusaha pu ON di.id_profil = pu.id $where_di")->row()->total ?? 0;
+        $tk = $this->db->query("SELECT COALESCE(SUM(di.TenagaKerjaLokal + di.TenagaKerjaAsing), 0) as total FROM DataInvestasi di JOIN ProfilUsaha pu ON di.id_profil = pu.id $where_di")->row()->total ?? 0;
 
         return [
             'total_pelaku_usaha' => (int)$total_pu,
@@ -107,22 +110,20 @@ class SINTAMIKA extends CI_Controller {
         ];
     }
 
-    // 4. Heatmap Sebaran Investasi di 18 Distrik
+    // 4. Heatmap Sebaran Investasi (Hanya 18 Distrik Mimika)
     private function _get_heatmap_distrik($tahun = null) {
-        $where = "WHERE pu.DeleteAt IS NULL AND di.DeleteAt IS NULL";
-        if (!empty($tahun)) {
-            $where .= " AND di.Tahun = ".$this->db->escape($tahun);
-        }
+        $tahun_filter = !empty($tahun) ? "AND di.Tahun = ".$this->db->escape($tahun) : "";
 
         $sql = "
             SELECT 
                 d.id, 
                 d.NamaDistrik, 
-                COALESCE(SUM(di.NilaiInvestasi), 0) as total_investasi,
+                COALESCE(SUM(di.NilaiInvestasiPMDN + di.NilaiInvestasiPMA), 0) as total_investasi,
                 COUNT(DISTINCT pu.id) as total_usaha
-            FROM distrik d
-            LEFT JOIN profilusaha pu ON d.id = pu.id_distrik AND pu.DeleteAt IS NULL
-            LEFT JOIN datainvestasi di ON pu.id = di.id_profil AND di.DeleteAt IS NULL " . (!empty($tahun) ? "AND di.Tahun = ".$this->db->escape($tahun) : "") . "
+            FROM Distrik d
+            LEFT JOIN ProfilUsaha pu ON d.id = pu.id_distrik AND pu.DeleteAt IS NULL
+            LEFT JOIN DataInvestasi di ON pu.id = di.id_profil AND di.DeleteAt IS NULL $tahun_filter
+            WHERE (d.id LIKE '91.09.%' OR d.id LIKE '94.04.%') AND CHAR_LENGTH(d.id) = 8
             GROUP BY d.id, d.NamaDistrik
             ORDER BY d.id ASC
         ";
@@ -130,7 +131,7 @@ class SINTAMIKA extends CI_Controller {
         return $this->db->query($sql)->result_array();
     }
 
-    // 5. Ranking Sektor Usaha (Berdasarkan Nilai Investasi)
+    // 5. Ranking Sektor Usaha (PMDN + PMA)
     private function _get_ranking_sektor($tahun = null, $id_distrik = null) {
         $where = "WHERE pu.DeleteAt IS NULL";
         if (!empty($tahun)) $where .= " AND pu.Tahun = ".$this->db->escape($tahun);
@@ -139,10 +140,10 @@ class SINTAMIKA extends CI_Controller {
         $sql = "
             SELECT 
                 pu.SektorUsaha,
-                COALESCE(SUM(di.NilaiInvestasi), 0) as total_investasi,
+                COALESCE(SUM(di.NilaiInvestasiPMDN + di.NilaiInvestasiPMA), 0) as total_investasi,
                 COUNT(DISTINCT pu.id) as total_usaha
-            FROM profilusaha pu
-            LEFT JOIN datainvestasi di ON pu.id = di.id_profil AND di.DeleteAt IS NULL
+            FROM ProfilUsaha pu
+            LEFT JOIN DataInvestasi di ON pu.id = di.id_profil AND di.DeleteAt IS NULL
             $where
             GROUP BY pu.SektorUsaha
             ORDER BY total_investasi DESC, total_usaha DESC
@@ -151,15 +152,18 @@ class SINTAMIKA extends CI_Controller {
         return $this->db->query($sql)->result_array();
     }
 
-    // 6. Top 5 Distrik Berdasarkan Nilai Investasi
+    // 6. Top 5 Distrik Berdasarkan Nilai Investasi (Hanya Distrik Mimika)
     private function _get_top_distrik($tahun = null) {
+        $tahun_filter = !empty($tahun) ? "AND di.Tahun = ".$this->db->escape($tahun) : "";
+
         $sql = "
             SELECT 
                 d.NamaDistrik,
-                COALESCE(SUM(di.NilaiInvestasi), 0) as total_investasi
-            FROM distrik d
-            LEFT JOIN profilusaha pu ON d.id = pu.id_distrik AND pu.DeleteAt IS NULL
-            LEFT JOIN datainvestasi di ON pu.id = di.id_profil AND di.DeleteAt IS NULL " . (!empty($tahun) ? "AND di.Tahun = ".$this->db->escape($tahun) : "") . "
+                COALESCE(SUM(di.NilaiInvestasiPMDN + di.NilaiInvestasiPMA), 0) as total_investasi
+            FROM Distrik d
+            LEFT JOIN ProfilUsaha pu ON d.id = pu.id_distrik AND pu.DeleteAt IS NULL
+            LEFT JOIN DataInvestasi di ON pu.id = di.id_profil AND di.DeleteAt IS NULL $tahun_filter
+            WHERE (d.id LIKE '91.09.%' OR d.id LIKE '94.04.%') AND CHAR_LENGTH(d.id) = 8
             GROUP BY d.id, d.NamaDistrik
             ORDER BY total_investasi DESC
             LIMIT 5
@@ -171,8 +175,8 @@ class SINTAMIKA extends CI_Controller {
     // 7. Data NIB Aktif / Profil Usaha Terbaru (5 Terakhir)
     private function _get_nib_terbaru($limit = 5) {
         $this->db->select('pu.*, d.NamaDistrik');
-        $this->db->from('profilusaha pu');
-        $this->db->join('distrik d', 'pu.id_distrik = d.id', 'left');
+        $this->db->from('ProfilUsaha pu');
+        $this->db->join('Distrik d', 'pu.id_distrik = d.id', 'left');
         $this->db->where('pu.DeleteAt', NULL);
         $this->db->order_by('pu.InputAt', 'DESC');
         $this->db->limit($limit);
@@ -189,7 +193,7 @@ class SINTAMIKA extends CI_Controller {
             SELECT 
                 SektorUsaha, 
                 COUNT(id) as total 
-            FROM profilusaha 
+            FROM ProfilUsaha 
             $where 
             GROUP BY SektorUsaha 
             ORDER BY total DESC
@@ -204,7 +208,7 @@ class SINTAMIKA extends CI_Controller {
         $query = function($th) {
             return $this->db->query("
                 SELECT Bulan, COALESCE(SUM(Jumlah), 0) as total 
-                FROM rekapizinbulan 
+                FROM RekapIzinBulan 
                 WHERE Tahun = ? AND DeleteAt IS NULL 
                 GROUP BY Bulan 
                 ORDER BY Bulan ASC
@@ -233,25 +237,25 @@ class SINTAMIKA extends CI_Controller {
 
         $izin_terbit = $this->db->query("
             SELECT COALESCE(SUM(Jumlah), 0) as total 
-            FROM rekapizinbulan 
+            FROM RekapIzinBulan 
             WHERE Tahun = ? AND DeleteAt IS NULL
         ", [$th])->row()->total ?? 0;
 
         $layanan_mpp = $this->db->query("
             SELECT COALESCE(SUM(Jumlah), 0) as total 
-            FROM rekapmppbulan 
+            FROM RekapMppBulan 
             WHERE Tahun = ? AND DeleteAt IS NULL
         ", [$th])->row()->total ?? 0;
 
         $total_jenis_izin = $this->db->query("
             SELECT COUNT(id) as total 
-            FROM jenisizin 
+            FROM JenisIzin 
             WHERE DeleteAt IS NULL
         ")->row()->total ?? 0;
 
         $total_opd = $this->db->query("
             SELECT COUNT(id) as total 
-            FROM opd 
+            FROM Opd 
             WHERE DeleteAt IS NULL
         ")->row()->total ?? 0;
 

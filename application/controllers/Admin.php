@@ -257,22 +257,29 @@ class Admin extends CI_Controller {
     }
 
     // ==========================================
-    // BAGIAN PROFIL USAHA
+    // BAGIAN PROFIL USAHA (DIPERBARUI DENGAN HIERARKI LOKASI)
     // ==========================================
     
     public function ProfilUsaha() {
-        // Ambil filter tahun, default tahun saat ini
         $tahun_get = $this->input->get('tahun');
         $tahun = !empty($tahun_get) ? (int)$tahun_get : (int)date('Y');
-
-        // Mengambil data distrik untuk dropdown (asumsi Anda punya tabel Distrik)
-        $data['distrik_list'] = $this->db->get('Distrik')->result();
         $data['tahun_filter'] = $tahun;
 
-        // Query Profil Usaha beserta join ke Distrik, difilter berdasarkan Tahun
-        $this->db->select('ProfilUsaha.*, Distrik.NamaDistrik');
+        // Ambil Data Provinsi (Format ID 2 Digit) untuk dropdown awal
+        $this->db->where('LENGTH(id)', 2);
+        $data['provinsi_list'] = $this->db->get('Distrik')->result();
+
+        // Query Profil Usaha (Join ke 4 level lokasi: Provinsi, Kab, Distrik, Kampung)
+        $this->db->select('ProfilUsaha.*, 
+                           P.NamaDistrik as NamaProvinsi, 
+                           K.NamaDistrik as NamaKabupaten, 
+                           D.NamaDistrik as NamaDistrik, 
+                           V.NamaDistrik as NamaKampung');
         $this->db->from('ProfilUsaha');
-        $this->db->join('Distrik', 'Distrik.id = ProfilUsaha.id_distrik', 'left');
+        $this->db->join('Distrik P', 'P.id = ProfilUsaha.id_provinsi', 'left');
+        $this->db->join('Distrik K', 'K.id = ProfilUsaha.id_kabupaten', 'left');
+        $this->db->join('Distrik D', 'D.id = ProfilUsaha.id_distrik', 'left');
+        $this->db->join('Distrik V', 'V.id = ProfilUsaha.id_kampung', 'left');
         $this->db->where('ProfilUsaha.Tahun', $tahun);
         $this->db->where('ProfilUsaha.DeleteAt IS NULL', null, false);
         $this->db->order_by('ProfilUsaha.id', 'DESC');
@@ -280,8 +287,32 @@ class Admin extends CI_Controller {
 
         $data['title'] = 'Profil Usaha - Admin SINTAMIKA';
         $this->load->view('Admin/Header');
-        // Load view (Header sudah diload di view file utama jika digabung, atau pisah sesuai struktur Anda)
         $this->load->view('Admin/ProfilUsaha', $data);
+    }
+
+    // AJAX Endpoint untuk memuat Child Lokasi
+    public function get_lokasi_anak($id_parent) {
+        if (ob_get_level() > 0) ob_clean(); 
+        
+        $len = strlen($id_parent);
+        $target_len = 0;
+        
+        if ($len == 2) $target_len = 5;      // Kabupaten (misal 91.03 = 5 karakter)
+        elseif ($len == 5) $target_len = 8;  // Distrik (misal 91.03.01 = 8 karakter)
+        elseif ($len == 8) $target_len = 13; // Kampung (misal 91.03.01.2001 = 13 karakter)
+        
+        if ($target_len > 0) {
+            $this->db->select('id, NamaDistrik');
+            $this->db->where('id LIKE', $id_parent . '.%');
+            $this->db->where('LENGTH(id)', $target_len);
+            $data = $this->db->get('Distrik')->result();
+            
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'success', 'data' => $data]));
+        }
+        
+        return $this->output->set_content_type('application/json')
+                            ->set_output(json_encode(['status' => 'error', 'data' => []]));
     }
 
     public function get_profil($id) {
@@ -297,7 +328,6 @@ class Admin extends CI_Controller {
         $id = $this->input->post('id');
         $tahun = $this->input->post('Tahun');
 
-        // Validasi Tahun di Sisi Server (Backend)
         if (strlen((string)$tahun) !== 4 || (int)$tahun <= 2015) {
             echo json_encode(['status' => 'error', 'message' => 'Format Tahun salah. Harus 4 angka dan di atas tahun 2015.']);
             return;
@@ -307,14 +337,16 @@ class Admin extends CI_Controller {
             'NIB' => $this->input->post('NIB'),
             'NamaUsaha' => $this->input->post('NamaUsaha'),
             'NamaPemilik' => $this->input->post('NamaPemilik'),
-            'SektorUsaha' => $this->input->post('SektorUsaha'), // String manual
+            'SektorUsaha' => $this->input->post('SektorUsaha'), 
+            'id_provinsi' => $this->input->post('id_provinsi'),
+            'id_kabupaten' => $this->input->post('id_kabupaten'),
             'id_distrik' => $this->input->post('id_distrik'),
+            'id_kampung' => $this->input->post('id_kampung'),
             'Alamat' => $this->input->post('Alamat'),
             'Tahun' => $tahun
         );
 
         if (empty($id)) {
-            // Tambah Data
             $insert = $this->db->insert('ProfilUsaha', $data);
             if ($insert) {
                 echo json_encode(['status' => 'success', 'message' => 'Profil Usaha berhasil ditambahkan!']);
@@ -322,7 +354,6 @@ class Admin extends CI_Controller {
                 echo json_encode(['status' => 'error', 'message' => 'Gagal menambah data.']);
             }
         } else {
-            // Update Data
             $this->db->where('id', $id);
             $update = $this->db->update('ProfilUsaha', $data);
             if ($update) {
@@ -336,7 +367,6 @@ class Admin extends CI_Controller {
     public function delete_profil($id) {
         if (ob_get_level() > 0) ob_clean(); 
         
-        // Pengecekan apakah Profil Usaha masih memiliki Data Investasi yang aktif
         $this->db->where('id_profil', $id);
         $this->db->where('DeleteAt IS NULL', null, false);
         $cek_investasi = $this->db->count_all_results('DataInvestasi');
@@ -349,7 +379,6 @@ class Admin extends CI_Controller {
                                 ]));
         }
 
-        // Jika tidak ada data investasi terkait, lanjutkan proses hapus (soft delete)
         $this->db->where('id', $id);
         $this->db->db_debug = FALSE;
         $update = $this->db->update('ProfilUsaha', ['DeleteAt' => date('Y-m-d H:i:s')]);
@@ -365,7 +394,7 @@ class Admin extends CI_Controller {
     }
 
     // ==========================================
-    // BAGIAN DATA INVESTASI & TENAGA KERJA (DIPERBAIKI)
+    // BAGIAN DATA INVESTASI & TENAGA KERJA
     // ==========================================
 
     public function DataInvestasi() {
@@ -379,7 +408,7 @@ class Admin extends CI_Controller {
         $data['tahun_filter'] = $tahun;
 
         $data['profil_list'] = $this->db->where('DeleteAt IS NULL', null, false)
-                                       ->order_by('NamaUsaha', 'ASC')
+                                       ->order_by('NamaUsaha', 'DESC')
                                        ->get('ProfilUsaha')
                                        ->result();
 
@@ -397,7 +426,6 @@ class Admin extends CI_Controller {
     }
 
     public function get_investasi($id) {
-        // PERBAIKAN: Gunakan ob_get_level() untuk mencegah PHP Notice
         if (ob_get_level() > 0) ob_clean(); 
         
         $data = $this->db->where('id', $id)
@@ -415,7 +443,6 @@ class Admin extends CI_Controller {
     }
 
     public function save_investasi() {
-        // PERBAIKAN: Mencegah output HTML merusak JSON
         if (ob_get_level() > 0) ob_clean(); 
         
         $id = $this->input->post('id');
@@ -429,15 +456,13 @@ class Admin extends CI_Controller {
         $data = array(
             'id_profil' => $this->input->post('id_profil'),
             'Tahun' => (int)$tahun,
-            'JenisInvestasi' => $this->input->post('JenisInvestasi'),
-            'NilaiInvestasi' => (double)$this->input->post('NilaiInvestasi'),
+            'NilaiInvestasiPMDN' => (double)$this->input->post('NilaiInvestasiPMDN'),
+            'NilaiInvestasiPMA' => (double)$this->input->post('NilaiInvestasiPMA'),
             'TenagaKerjaLokal' => (int)$this->input->post('TenagaKerjaLokal'),
             'TenagaKerjaAsing' => (int)$this->input->post('TenagaKerjaAsing'),
             'UpdatedAt' => date('Y-m-d H:i:s')
         );
 
-        // PERBAIKAN KRUSIAL: Matikan debug DB agar CI tidak mencetak halaman HTML Error 
-        // yang membuat AJAX mengira terjadi "Kesalahan Server/Koneksi"
         $this->db->db_debug = FALSE; 
 
         if (empty($id)) {
@@ -447,7 +472,6 @@ class Admin extends CI_Controller {
                 return $this->output->set_content_type('application/json')
                                     ->set_output(json_encode(['status' => 'success', 'message' => 'Data Investasi berhasil ditambahkan!']));
             } else {
-                // Tangkap error spesifik database
                 $db_error = $this->db->error();
                 return $this->output->set_content_type('application/json')
                                     ->set_output(json_encode(['status' => 'error', 'message' => 'Gagal menambah data DB: ' . $db_error['message']]));
@@ -470,7 +494,7 @@ class Admin extends CI_Controller {
         if (ob_get_level() > 0) ob_clean(); 
         
         $this->db->where('id', $id);
-        $this->db->db_debug = FALSE; // Matikan HTML error
+        $this->db->db_debug = FALSE; 
         $update = $this->db->update('DataInvestasi', ['DeleteAt' => date('Y-m-d H:i:s')]);
         
         if ($update) {
@@ -519,14 +543,14 @@ class Admin extends CI_Controller {
 
         // Ambil Data OPD
         $opd_list = $this->db->where('DeleteAt IS NULL', null, false)
-                             ->order_by('id', 'ASC')
+                             ->order_by('id', 'DESC')
                              ->get('Opd')
                              ->result();
 
         foreach ($opd_list as $opd) {
             $pelayanan_list = $this->db->where('id_opd', $opd->id)
                                        ->where('DeleteAt IS NULL', null, false)
-                                       ->order_by('id', 'ASC')
+                                       ->order_by('id', 'DESC')
                                        ->get('PelayananMpp')
                                        ->result();
 

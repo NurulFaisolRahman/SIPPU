@@ -1,7 +1,7 @@
-           <!-- ExcelJS untuk Export Excel -->
+            <!-- ExcelJS untuk Export Excel -->
             <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 
-           <!-- SCROLLABLE CONTENT BODY -->
+            <!-- SCROLLABLE CONTENT BODY -->
             <div class="w-full p-1 md:p-1 lg:p-1 pb-16">
                 <div class="bg-gradient-to-r from-teal-900 to-[#0a1324] border border-teal-800/50 rounded-xl p-6 mb-6 flex flex-col sm:flex-row items-center justify-between shadow-lg shadow-teal-900/20 relative overflow-hidden">
                     <div class="absolute right-0 top-0 opacity-10 transform translate-x-1/4 -translate-y-1/4">
@@ -9,7 +9,7 @@
                     </div>
                     <div class="relative z-10 text-center sm:text-left mb-4 sm:mb-0">
                         <h2 class="text-2xl font-bold text-white mb-1">Database Profil Usaha</h2>
-                        <p class="text-sm text-teal-200">Manajemen data pelaku usaha, NIB, dan sektor industri di wilayah Mimika.</p>
+                        <p class="text-sm text-teal-200">Manajemen data pelaku usaha, NIB, dan sektor industri beserta lokasi detail.</p>
                     </div>
                     <div class="relative z-10 flex gap-4 text-center">
                         <div class="bg-[#050e1d]/50 backdrop-blur-sm border border-teal-500/30 px-4 py-2 rounded-lg">
@@ -48,12 +48,12 @@
                         <table id="tabelProfil" class="w-full text-left text-[11px] text-slate-300">
                             <thead class="text-[10px] uppercase bg-[#050e1d] text-slate-400 border-b border-[#1e2d4a]">
                                 <tr>
-                                    <th scope="col" class="px-4 py-3 font-semibold w-12 text-center">No</th>
-                                    <th scope="col" class="px-4 py-3 font-semibold text-center w-16">Tahun</th>
+                                    <th scope="col" class="px-4 py-3 font-semibold w-12 !text-center">No</th>
                                     <th scope="col" class="px-4 py-3 font-semibold">Nama Usaha (NIB)</th>
                                     <th scope="col" class="px-4 py-3 font-semibold">Pemilik</th>
-                                    <th scope="col" class="px-4 py-3 font-semibold">Sektor & Distrik</th>
-                                    <th scope="col" class="px-4 py-3 font-semibold text-center w-20">Aksi</th>
+                                    <th scope="col" class="px-4 py-3 font-semibold">Sektor Usaha</th>
+                                    <th scope="col" class="px-4 py-3 font-semibold w-48">Lokasi (Provinsi - Kampung)</th>
+                                    <th scope="col" class="px-4 py-3 font-semibold !text-center w-20">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-[#1e2d4a]/50">
@@ -61,13 +61,6 @@
                                     <?php foreach($profil_usaha_data as $index => $row): ?>
                                     <tr class="hover:bg-[#0c1833] transition-colors">
                                         <td class="px-4 py-3 text-center font-medium text-slate-500"><?= $index + 1 ?></td>
-                                        
-                                        <!-- Kolom Tahun -->
-                                        <td class="px-4 py-3 text-center">
-                                            <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded text-[10px] font-bold">
-                                                <?= htmlspecialchars($row->Tahun) ?>
-                                            </span>
-                                        </td>
 
                                         <td class="px-4 py-3 whitespace-normal break-words max-w-[200px]">
                                             <div class="text-white font-bold text-sm mb-0.5"><?= htmlspecialchars($row->NamaUsaha) ?></div>
@@ -81,13 +74,17 @@
                                         </td>
                                         
                                         <td class="px-4 py-3 text-slate-400">
-                                            <span class="bg-teal-500/10 text-teal-400 border border-teal-500/20 px-2 py-0.5 rounded text-[10px] inline-block mb-1">
+                                            <span class="bg-teal-500/10 text-teal-400 border border-teal-500/20 px-2 py-0.5 rounded text-[10px] inline-block">
                                                 <?= htmlspecialchars($row->SektorUsaha ? $row->SektorUsaha : '-') ?>
-                                            </span><br>
-                                            <div class="flex items-center gap-1 mt-0.5">
-                                                <i data-lucide="map-pin" class="w-3 h-3 text-slate-500"></i> 
-                                                <?= htmlspecialchars($row->NamaDistrik ? $row->NamaDistrik : 'Distrik Tidak Valid') ?>
-                                            </div>
+                                            </span>
+                                        </td>
+
+                                        <!-- Kolom Lokasi Lengkap -->
+                                        <td class="px-4 py-3 text-slate-400 text-[10px] leading-tight">
+                                            <div class="font-bold text-teal-300 mb-0.5"><?= htmlspecialchars($row->NamaProvinsi ? $row->NamaProvinsi : '-') ?></div>
+                                            <div>Kab. <?= htmlspecialchars($row->NamaKabupaten ? $row->NamaKabupaten : '-') ?></div>
+                                            <div>Kec. <?= htmlspecialchars($row->NamaDistrik ? $row->NamaDistrik : '-') ?></div>
+                                            <div class="text-slate-500">Ds. <?= htmlspecialchars($row->NamaKampung ? $row->NamaKampung : '-') ?></div>
                                         </td>
                                         
                                         <td class="px-4 py-3 text-center">
@@ -114,81 +111,102 @@
         <div id="modalCRUD" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
             <div class="absolute inset-0 bg-[#030816]/80 backdrop-blur-sm transition-opacity duration-300" onclick="closeModal()"></div>
             
-            <div id="modalContent" class="relative w-full max-w-[650px] bg-[#0b172e] border border-[#1e2d4a] rounded-xl shadow-2xl flex flex-col transition-all duration-300 modal-leave">
+            <div id="modalContent" class="relative w-full max-w-[650px] bg-[#0b172e] border border-[#1e2d4a] rounded-xl shadow-2xl flex flex-col transition-all duration-300 modal-leave h-[90vh] md:h-auto overflow-hidden">
                 
-                <div class="flex items-center justify-between p-5 border-b border-[#1e2d4a]/80 bg-[#071126] rounded-t-xl">
+                <div class="flex items-center justify-between p-5 border-b border-[#1e2d4a]/80 bg-[#071126] rounded-t-xl shrink-0">
                     <h3 id="modalTitle" class="text-white font-bold text-sm tracking-wide">Tambah Profil Usaha</h3>
                     <button onclick="closeModal()" class="text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 p-1.5 rounded-md transition-colors">
                         <i data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
                 
-                <form id="formProfil" onsubmit="saveData(event)" class="p-6 flex flex-col gap-4">
-                    <input type="hidden" id="inputId" name="id" value="">
+                <form id="formProfil" onsubmit="saveData(event)" class="flex flex-col h-full overflow-hidden">
+                    <div class="p-6 overflow-y-auto flex-1 gap-4 flex flex-col custom-scrollbar">
+                        <input type="hidden" id="inputId" name="id" value="">
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-4">
-                            <!-- INPUT TAHUN -->
-                            <div class="space-y-1.5">
-                                <label class="text-[11px] font-semibold text-slate-300 uppercase block">Tahun Pendataan</label>
-                                <input type="number" id="inputTahun" name="Tahun" placeholder="Misal: 2024" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required min="2016" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);" maxlength="4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-4">
+                                <div class="space-y-1.5">
+                                    <label class="text-[11px] font-semibold text-slate-300 uppercase block">Tahun Pendataan</label>
+                                    <input type="number" id="inputTahun" name="Tahun" placeholder="Misal: 2024" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required min="2016" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);" maxlength="4">
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="text-[11px] font-semibold text-slate-300 uppercase block">Nomor Induk Berusaha (NIB)</label>
+                                    <input type="text" id="inputNIB" name="NIB" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="text-[11px] font-semibold text-slate-300 uppercase block">Nama Perusahaan / Usaha</label>
+                                    <input type="text" id="inputNamaUsaha" name="NamaUsaha" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required>
+                                </div>
                             </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[11px] font-semibold text-slate-300 uppercase block">Nomor Induk Berusaha (NIB)</label>
-                                <input type="text" id="inputNIB" name="NIB" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required>
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="text-[11px] font-semibold text-slate-300 uppercase block">Nama Perusahaan / Usaha</label>
-                                <input type="text" id="inputNamaUsaha" name="NamaUsaha" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required>
+                            
+                            <div class="space-y-4">
+                                <div class="space-y-1.5">
+                                    <label class="text-[11px] font-semibold text-slate-300 uppercase block">Nama Pemilik / Direktur</label>
+                                    <input type="text" id="inputNamaPemilik" name="NamaPemilik" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required>
+                                </div>
+
+                                <div class="space-y-1.5">
+                                    <label class="text-[11px] font-semibold text-slate-300 uppercase block">Sektor Usaha</label>
+                                    <select id="inputSektorUsaha" name="SektorUsaha" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required>
+                                        <option value="">-- Pilih Sektor --</option>
+                                        <option value="Pertanian & Perkebunan">Pertanian & Perkebunan</option>
+                                        <option value="Pertambangan & Penggalian">Pertambangan & Penggalian</option>
+                                        <option value="Industri Pengolahan">Industri Pengolahan</option>
+                                        <option value="Konstruksi">Konstruksi</option>
+                                        <option value="Perdagangan Besar & Eceran">Perdagangan Besar & Eceran</option>
+                                        <option value="Transportasi & Pergudangan">Transportasi & Pergudangan</option>
+                                        <option value="Penyediaan Akomodasi & Makan Minum">Penyediaan Akomodasi & Makan Minum</option>
+                                        <option value="Informasi & Komunikasi">Informasi & Komunikasi</option>
+                                        <option value="Jasa Keuangan & Asuransi">Jasa Keuangan & Asuransi</option>
+                                        <option value="Jasa Kesehatan">Jasa Kesehatan</option>
+                                        <option value="Jasa Pendidikan">Jasa Pendidikan</option>
+                                        <option value="Sektor Lainnya">Sektor Lainnya</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="space-y-4">
-                            <div class="space-y-1.5">
-                                <label class="text-[11px] font-semibold text-slate-300 uppercase block">Nama Pemilik / Direktur</label>
-                                <input type="text" id="inputNamaPemilik" name="NamaPemilik" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required>
-                            </div>
 
-                            <!-- SEKTOR USAHA (MANUAL LIST) -->
+                        <!-- LOKASI HIERARKI (Cascading Dropdown) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-[#1e2d4a] pt-4 mt-2">
                             <div class="space-y-1.5">
-                                <label class="text-[11px] font-semibold text-slate-300 uppercase block">Sektor Usaha</label>
-                                <select id="inputSektorUsaha" name="SektorUsaha" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required>
-                                    <option value="">-- Pilih Sektor --</option>
-                                    <option value="Pertanian & Perkebunan">Pertanian & Perkebunan</option>
-                                    <option value="Pertambangan & Penggalian">Pertambangan & Penggalian</option>
-                                    <option value="Industri Pengolahan">Industri Pengolahan</option>
-                                    <option value="Konstruksi">Konstruksi</option>
-                                    <option value="Perdagangan Besar & Eceran">Perdagangan Besar & Eceran</option>
-                                    <option value="Transportasi & Pergudangan">Transportasi & Pergudangan</option>
-                                    <option value="Penyediaan Akomodasi & Makan Minum">Penyediaan Akomodasi & Makan Minum</option>
-                                    <option value="Informasi & Komunikasi">Informasi & Komunikasi</option>
-                                    <option value="Jasa Keuangan & Asuransi">Jasa Keuangan & Asuransi</option>
-                                    <option value="Jasa Kesehatan">Jasa Kesehatan</option>
-                                    <option value="Jasa Pendidikan">Jasa Pendidikan</option>
-                                    <option value="Sektor Lainnya">Sektor Lainnya</option>
-                                </select>
-                            </div>
-
-                            <div class="space-y-1.5">
-                                <label class="text-[11px] font-semibold text-slate-300 uppercase block">Lokasi (Distrik)</label>
-                                <select id="inputIdDistrik" name="id_distrik" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required>
-                                    <option value="">-- Pilih Distrik --</option>
-                                    <?php if(!empty($distrik_list)): ?>
-                                        <?php foreach($distrik_list as $distrik): ?>
-                                            <option value="<?= $distrik->id ?>"><?= htmlspecialchars($distrik->NamaDistrik) ?></option>
+                                <label class="text-[11px] font-semibold text-slate-300 uppercase block">Provinsi</label>
+                                <select id="inputIdProvinsi" name="id_provinsi" onchange="loadLokasi(this.value, 'inputIdKabupaten')" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required>
+                                    <option value="">-- Pilih Provinsi --</option>
+                                    <?php if(!empty($provinsi_list)): ?>
+                                        <?php foreach($provinsi_list as $prov): ?>
+                                            <option value="<?= $prov->id ?>"><?= htmlspecialchars($prov->NamaDistrik) ?></option>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
                                 </select>
                             </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[11px] font-semibold text-slate-300 uppercase block">Kabupaten</label>
+                                <select id="inputIdKabupaten" name="id_kabupaten" onchange="loadLokasi(this.value, 'inputIdDistrik')" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required disabled>
+                                    <option value="">-- Pilih Kabupaten --</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[11px] font-semibold text-slate-300 uppercase block">Distrik / Kecamatan</label>
+                                <select id="inputIdDistrik" name="id_distrik" onchange="loadLokasi(this.value, 'inputIdKampung')" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required disabled>
+                                    <option value="">-- Pilih Distrik --</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[11px] font-semibold text-slate-300 uppercase block">Kampung / Desa</label>
+                                <select id="inputIdKampung" name="id_kampung" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required disabled>
+                                    <option value="">-- Pilih Kampung --</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-1.5 mt-2">
+                            <label class="text-[11px] font-semibold text-slate-300 uppercase block">Alamat Jalan / Lengkap</label>
+                            <textarea id="inputAlamat" name="Alamat" rows="2" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required></textarea>
                         </div>
                     </div>
-                    
-                    <div class="space-y-1.5 mt-1">
-                        <label class="text-[11px] font-semibold text-slate-300 uppercase block">Alamat Lengkap</label>
-                        <textarea id="inputAlamat" name="Alamat" rows="2" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required></textarea>
-                    </div>
 
-                    <div class="mt-4 flex justify-end gap-3 pt-4 border-t border-[#1e2d4a]">
+                    <div class="p-5 flex justify-end gap-3 border-t border-[#1e2d4a]/80 bg-[#071126] rounded-b-xl shrink-0">
                         <button type="button" onclick="closeModal()" class="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700">Batal</button>
                         <button type="submit" id="btnSubmitForm" class="px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-500 rounded-lg transition-colors shadow-lg shadow-teal-900/40 border border-teal-500/50 flex items-center gap-2">
                             <i data-lucide="save" class="w-4 h-4"></i> Simpan Data Profil
@@ -200,7 +218,6 @@
     </div>
 
     <script>
-        // Siapkan Data JSON untuk keperluan Export PDF/Excel
         const dataProfilExport = <?= !empty($profil_usaha_data) ? json_encode($profil_usaha_data) : '[]' ?>;
         const currentTahunFilter = $('#filterTahun').val();
         const monthNamesIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -221,14 +238,64 @@
             }
         });
 
+        // ==========================================
+        // CASCADING DROPDOWN LOGIC
+        // ==========================================
+        function loadLokasi(parentId, targetSelectId, selectedValue = null) {
+            const target = $('#' + targetSelectId);
+            target.html('<option value="">Sedang memuat...</option>').prop('disabled', true);
+            
+            // Reset dropdown di bawahnya secara otomatis
+            if (targetSelectId === 'inputIdKabupaten') {
+                $('#inputIdDistrik').html('<option value="">-- Pilih Distrik --</option>').prop('disabled', true);
+                $('#inputIdKampung').html('<option value="">-- Pilih Kampung --</option>').prop('disabled', true);
+            } else if (targetSelectId === 'inputIdDistrik') {
+                $('#inputIdKampung').html('<option value="">-- Pilih Kampung --</option>').prop('disabled', true);
+            }
+
+            if (!parentId) {
+                target.html('<option value="">-- Pilih --</option>');
+                return Promise.resolve();
+            }
+
+            return $.ajax({
+                url: `<?= base_url('Admin/get_lokasi_anak/') ?>${parentId}`,
+                method: 'GET',
+                dataType: 'json'
+            }).then(res => {
+                let options = '<option value="">-- Pilih Data --</option>';
+                if (res.status === 'success' && res.data.length > 0) {
+                    res.data.forEach(item => {
+                        options += `<option value="${item.id}">${item.NamaDistrik}</option>`;
+                    });
+                    target.html(options).prop('disabled', false);
+                    
+                    if (selectedValue) {
+                        target.val(selectedValue);
+                    }
+                } else {
+                    target.html('<option value="">-- Tidak ada sub-data --</option>');
+                }
+            }).catch(err => {
+                target.html('<option value="">-- Error Memuat --</option>');
+            });
+        }
+
+
         function openModal(isEdit = false) {
             $('#modalCRUD').removeClass('hidden');
             setTimeout(() => { $('#modalContent').removeClass('modal-leave').addClass('modal-enter'); }, 10);
+            
             if (!isEdit) {
                 $('#modalTitle').text('Tambah Profil Usaha');
                 $('#formProfil')[0].reset();
                 $('#inputId').val(''); 
-                $('#inputTahun').val(currentTahunFilter); // set default tahun filter saat ini
+                $('#inputTahun').val(currentTahunFilter);
+                
+                // Reset select cascading agar disable kembali
+                $('#inputIdKabupaten').html('<option value="">-- Pilih Kabupaten --</option>').prop('disabled', true);
+                $('#inputIdDistrik').html('<option value="">-- Pilih Distrik --</option>').prop('disabled', true);
+                $('#inputIdKampung').html('<option value="">-- Pilih Kampung --</option>').prop('disabled', true);
             }
         }
 
@@ -237,33 +304,53 @@
             setTimeout(() => { $('#modalCRUD').addClass('hidden'); }, 300); 
         }
 
-        function editProfil(id) {
-            $.ajax({
-                url: `<?= base_url('Admin/get_profil/') ?>${id}`,
-                method: 'GET', dataType: 'json',
-                success: function(res) {
-                    if (res && res.status === 'success') {
-                        $('#modalTitle').text('Edit Profil Usaha');
-                        $('#inputId').val(res.data.id);
-                        $('#inputTahun').val(res.data.Tahun);
-                        $('#inputNIB').val(res.data.NIB);
-                        $('#inputNamaUsaha').val(res.data.NamaUsaha);
-                        $('#inputNamaPemilik').val(res.data.NamaPemilik);
-                        $('#inputSektorUsaha').val(res.data.SektorUsaha);
-                        $('#inputIdDistrik').val(res.data.id_distrik);
-                        $('#inputAlamat').val(res.data.Alamat);
-                        openModal(true); 
-                    } else {
-                        Swal.fire({ icon: 'error', title: 'Gagal!', text: res.message, background: '#0b172e', color: '#fff' });
+        async function editProfil(id) {
+            try {
+                // Tampilkan loading spinner agar user tahu proses get sedang berlangsung
+                Swal.fire({
+                    title: 'Memuat Data...',
+                    allowOutsideClick: false, background: '#0b172e', color: '#fff',
+                    didOpen: () => { Swal.showLoading(); }
+                });
+
+                const res = await $.ajax({ url: `<?= base_url('Admin/get_profil/') ?>${id}`, method: 'GET', dataType: 'json' });
+                
+                if (res && res.status === 'success') {
+                    $('#modalTitle').text('Edit Profil Usaha');
+                    $('#inputId').val(res.data.id);
+                    $('#inputTahun').val(res.data.Tahun);
+                    $('#inputNIB').val(res.data.NIB);
+                    $('#inputNamaUsaha').val(res.data.NamaUsaha);
+                    $('#inputNamaPemilik').val(res.data.NamaPemilik);
+                    $('#inputSektorUsaha').val(res.data.SektorUsaha);
+                    $('#inputAlamat').val(res.data.Alamat);
+                    
+                    // Set hierarki Provinsi - Kampung 
+                    $('#inputIdProvinsi').val(res.data.id_provinsi);
+                    
+                    if(res.data.id_provinsi) {
+                        await loadLokasi(res.data.id_provinsi, 'inputIdKabupaten', res.data.id_kabupaten);
+                        if(res.data.id_kabupaten) {
+                            await loadLokasi(res.data.id_kabupaten, 'inputIdDistrik', res.data.id_distrik);
+                            if(res.data.id_distrik) {
+                                await loadLokasi(res.data.id_distrik, 'inputIdKampung', res.data.id_kampung);
+                            }
+                        }
                     }
+                    
+                    Swal.close(); // tutup modal loading
+                    openModal(true); 
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Gagal!', text: res.message, background: '#0b172e', color: '#fff' });
                 }
-            });
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: 'Error!', text: 'Terjadi kesalahan saat memuat data dari server.', background: '#0b172e', color: '#fff' });
+            }
         }
 
         function saveData(event) {
             event.preventDefault();
             
-            // Validasi Tahun Sisi Client
             const tahunInput = $('#inputTahun').val();
             if(tahunInput.length !== 4 || parseInt(tahunInput) <= 2015) {
                 Swal.fire({ icon: 'warning', title: 'Tahun Tidak Valid', text: 'Tahun harus terdiri dari 4 digit dan lebih dari 2015.', background: '#0b172e', color: '#fff' });
@@ -315,11 +402,10 @@
             const workbook = new window.ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Profil Usaha');
             
-            // Kolom: NO, TAHUN, NIB, NAMA USAHA, PEMILIK, SEKTOR, DISTRIK, ALAMAT
-            const totalCols = 7; 
-            const lastColLetter = 'G';
+            // Kolom diperbesar hingga J (10 Kolom)
+            const totalCols = 10; 
+            const lastColLetter = 'J';
 
-            // KOP SURAT (Tanpa Logo, tulisan ditengah rata A sampai H)
             worksheet.addRow(['PEMERINTAH KABUPATEN MIMIKA']);
             worksheet.mergeCells(`A1:${lastColLetter}1`);
             worksheet.getCell('A1').font = { name: 'Arial', size: 14, bold: true };
@@ -340,14 +426,12 @@
             worksheet.getCell('A4').font = { name: 'Arial', size: 11 };
             worksheet.getCell('A4').alignment = { vertical: 'middle', horizontal: 'center' };
             
-            // Garis Bawah Kop
             for(let i = 1; i <= totalCols; i++) {
                 worksheet.getCell(5, i).border = { bottom: { style: 'double' } };
             }
 
             worksheet.addRow([]); 
 
-            // Judul Tabel
             worksheet.addRow([`REKAPITULASI PROFIL USAHA ${rentangText}`]);
             worksheet.mergeCells(`A7:${lastColLetter}7`);
             worksheet.getCell('A7').font = { name: 'Arial', size: 12, bold: true };
@@ -355,8 +439,8 @@
 
             worksheet.addRow([]); 
 
-            // Header Tabel
-            let headers = ['NO', 'NIB', 'NAMA USAHA', 'PEMILIK', 'SEKTOR USAHA', 'DISTRIK', 'ALAMAT'];
+            // Header Tabel Update
+            let headers = ['NO', 'NIB', 'NAMA USAHA', 'PEMILIK', 'SEKTOR USAHA', 'PROVINSI', 'KABUPATEN', 'DISTRIK', 'KAMPUNG', 'ALAMAT'];
             const headerRow = worksheet.addRow(headers);
             
             headerRow.eachCell((cell) => {
@@ -366,12 +450,14 @@
                 cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
             });
 
-            // Data Body
             if (dataProfilExport.length > 0) {
                 dataProfilExport.forEach((item, index) => {
                     const rowData = [
                         (index + 1), item.NIB, item.NamaUsaha, 
-                        item.NamaPemilik, (item.SektorUsaha || '-'), (item.NamaDistrik || '-'), item.Alamat
+                        item.NamaPemilik, (item.SektorUsaha || '-'), 
+                        (item.NamaProvinsi || '-'), (item.NamaKabupaten || '-'), 
+                        (item.NamaDistrik || '-'), (item.NamaKampung || '-'), 
+                        item.Alamat
                     ];
                     const dataRow = worksheet.addRow(rowData);
                     
@@ -386,17 +472,16 @@
                     });
                 });
             } else {
-                const emptyRow = worksheet.addRow(['Belum ada data', '', '', '', '', '', '', '']);
-                worksheet.mergeCells(`A${emptyRow.number}:H${emptyRow.number}`);
+                const emptyRow = worksheet.addRow(['Belum ada data', '', '', '', '', '', '', '', '', '']);
+                worksheet.mergeCells(`A${emptyRow.number}:J${emptyRow.number}`);
                 emptyRow.getCell(1).alignment = { horizontal: 'center' };
             }
 
             worksheet.addRow([]); worksheet.addRow([]);
             
-            // Tanda Tangan
             const now = new Date();
             const dateStr = `${now.getDate()} ${monthNamesIndo[now.getMonth()]} ${now.getFullYear()}`;
-            const sigStartCol = 6; 
+            const sigStartCol = 8; // Geser ke kanan
             
             const addSigLine = (text, bold = false) => {
                 const row = worksheet.addRow([]);
@@ -420,7 +505,8 @@
             // Lebar Kolom
             worksheet.columns = [
                 { width: 6 },  { width: 20 }, { width: 35 }, 
-                { width: 25 }, { width: 30 }, { width: 20 }, { width: 40 }
+                { width: 25 }, { width: 30 }, { width: 20 }, 
+                { width: 20 }, { width: 20 }, { width: 20 }, { width: 40 }
             ];
             worksheet.getRow(1).height = 25; worksheet.getRow(2).height = 20;
 
@@ -463,7 +549,6 @@
                     doc.addImage(logoBase64, 'PNG', 25, 6, 22, 28);
                 } catch (e) { console.warn("Logo tidak terload."); }
 
-                // KOP SURAT
                 doc.setTextColor(0, 0, 0);
                 doc.setFont("helvetica", "bold"); doc.setFontSize(15);
                 doc.text("PEMERINTAH KABUPATEN MIMIKA", 148, 15, { align: "center" });
@@ -479,46 +564,42 @@
                 doc.setLineWidth(1.0); doc.line(15, 37, 282, 37);
                 doc.setLineWidth(0.3); doc.line(15, 38.5, 282, 38.5);
 
-                // JUDUL
                 doc.setFont("helvetica", "bold"); doc.setFontSize(11);
                 const titleText = `REKAPITULASI PROFIL USAHA TAHUN ${currentTahunFilter}`;
                 doc.text(titleText, 148, 47, { align: "center" });
                 
-                // DATA TABEL
-                let tableHeaders = ['NO', 'TAHUN', 'NIB', 'NAMA USAHA', 'PEMILIK', 'SEKTOR USAHA', 'DISTRIK', 'ALAMAT'];
+                // Meringkas Kolom agar muat di PDF (Lokasi digabung jadi 1 sel per baris)
+                let tableHeaders = ['NO', 'NIB', 'NAMA USAHA', 'PEMILIK', 'SEKTOR USAHA', 'LOKASI (PROV-KMP)', 'ALAMAT'];
                 let tableBody = [];
 
                 if (dataProfilExport.length > 0) {
                     dataProfilExport.forEach((item, index) => {
+                        const strLokasi = `${item.NamaProvinsi||'-'}\nKab. ${item.NamaKabupaten||'-'}\nKec. ${item.NamaDistrik||'-'}\nDs. ${item.NamaKampung||'-'}`;
                         tableBody.push([
-                            (index + 1).toString(), item.Tahun.toString(), item.NIB, 
-                            item.NamaUsaha, item.NamaPemilik, (item.SektorUsaha || '-'), 
-                            (item.NamaDistrik || '-'), item.Alamat
+                            (index + 1).toString(), item.NIB, item.NamaUsaha, 
+                            item.NamaPemilik, (item.SektorUsaha || '-'), strLokasi, item.Alamat
                         ]);
                     });
                 } else {
-                    tableBody.push([{ content: 'Belum ada data profil usaha.', colSpan: 8, styles: { halign: 'center' } }]);
+                    tableBody.push([{ content: 'Belum ada data profil usaha.', colSpan: 7, styles: { halign: 'center' } }]);
                 }
 
                 doc.autoTable({
                     startY: 54, head: [tableHeaders], body: tableBody, theme: 'grid',
                     headStyles: { fillColor: [146, 205, 220], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center', valign: 'middle', lineWidth: 0.2, lineColor: [0, 0, 0], fontSize: 8 },
-                    bodyStyles: { textColor: [0, 0, 0], lineWidth: 0.2, lineColor: [0, 0, 0], fontSize: 8 },
+                    bodyStyles: { textColor: [0, 0, 0], lineWidth: 0.2, lineColor: [0, 0, 0], fontSize: 8, valign: 'top' },
                     columnStyles: { 
-                        0: { halign: 'center', cellWidth: 10 }, 1: { halign: 'center', cellWidth: 15 }, 2: { halign: 'center', cellWidth: 30 } 
+                        0: { halign: 'center', cellWidth: 10 }, 1: { halign: 'center', cellWidth: 25 }, 5: { cellWidth: 35 }
                     },
                     margin: { top: 15, right: 15, bottom: 20, left: 15 }
                 });
 
-                // TANDA TANGAN
                 const finalY = doc.lastAutoTable.finalY + 10;
                 const now = new Date();
                 const dateStr = `${now.getDate()} ${monthNamesIndo[now.getMonth()]} ${now.getFullYear()}`;
                 const rightMargin = 205; 
 
-                // Deteksi page break
                 if (finalY > 170) { doc.addPage(); }
-
                 let signY = finalY > 170 ? 20 : finalY;
 
                 doc.setFont("helvetica", "normal"); doc.setFontSize(9);

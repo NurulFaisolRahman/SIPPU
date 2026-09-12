@@ -1,14 +1,3 @@
-    <!-- SheetJS Library untuk Export Excel Client-side -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-    <style>
-        /* Styling scrollbar kustom untuk tabel rekap */
-        .table-responsive::-webkit-scrollbar { height: 8px; width: 8px; }
-        .table-responsive::-webkit-scrollbar-track { background: #050e1d; border-radius: 4px; }
-        .table-responsive::-webkit-scrollbar-thumb { background: #1e2d4a; border-radius: 4px; }
-        .table-responsive::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
-    </style>
-
     <!-- SCROLLABLE CONTENT BODY -->
     <div class="w-full p-1 md:p-1 lg:p-1 pb-16">
         
@@ -53,10 +42,6 @@
                     </div>
 
                     <div class="h-5 w-[1px] bg-[#1e2d4a] hidden sm:block"></div>
-
-                    <!-- <div class="flex items-center gap-2 text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                        <i data-lucide="filter" class="w-4 h-4 text-blue-400"></i> Rentang Bulan:
-                    </div> -->
 
                     <!-- PRESET FILTER BULAN -->
                     <select id="selectPresetRange" onchange="applyPresetRange()" class="bg-[#050e1d] border border-[#1e2d4a] text-blue-300 text-xs font-medium rounded-lg px-3 py-2 outline-none focus:border-blue-500 transition-colors">
@@ -111,7 +96,7 @@
                 <table id="tabelIzin" class="w-full text-left text-[10px] text-slate-300 relative">
                     <thead class="text-[9px] uppercase bg-[#050e1d] text-slate-400 border-b border-[#1e2d4a] sticky top-0 z-20">
                         <tr id="tableHeaderRow">
-                            <th scope="col" class="px-2 py-2.5 font-semibold w-8 text-center align-middle whitespace-nowrap border-r border-[#1e2d4a]/50">No</th>
+                            <th scope="col" class="px-2 py-2.5 font-semibold w-8 !text-center align-middle whitespace-nowrap border-r border-[#1e2d4a]/50">No</th>
                             <th scope="col" class="px-2 py-2.5 font-semibold min-w-[130px] text-center align-middle whitespace-nowrap border-r border-[#1e2d4a]/50">Nama Jenis Perizinan</th>
                             
                             <!-- HEADERS BULAN (JAN - DES) -->
@@ -120,11 +105,11 @@
                             foreach($shortMonths as $idx => $mName): 
                                 $bNum = $idx + 1;
                             ?>
-                                <th scope="col" class="col-month col-month-<?= $bNum ?> px-1.5 py-2.5 font-semibold text-center align-middle whitespace-nowrap border-r border-[#1e2d4a]/30 w-10"><?= $mName ?></th>
+                                <th scope="col" class="col-month col-month-<?= $bNum ?> px-1.5 py-2.5 font-semibold !text-center align-middle whitespace-nowrap border-r border-[#1e2d4a]/30 w-10"><?= $mName ?></th>
                             <?php endforeach; ?>
 
-                            <th scope="col" class="px-2 py-2.5 font-semibold text-center align-middle whitespace-nowrap w-16 text-emerald-400 bg-[#071329] border-r border-[#1e2d4a]/50">TOTAL</th>
-                            <th scope="col" class="px-2 py-2.5 font-semibold text-center align-middle w-16 whitespace-nowrap">Aksi</th>
+                            <th scope="col" class="px-2 py-2.5 font-semibold !text-center align-middle whitespace-nowrap w-16 text-emerald-400 bg-[#071329] border-r border-[#1e2d4a]/50">TOTAL</th>
+                            <th scope="col" class="px-2 py-2.5 font-semibold !text-center align-middle w-16 whitespace-nowrap">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-[#1e2d4a]/50">
@@ -173,26 +158,22 @@
                             </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <tr>
-                                <td colspan="16" class="px-4 py-8 text-center text-slate-500 italic text-[11px]">
-                                    Belum ada data Jenis Perizinan yang tersimpan untuk Tahun <?= $selected_tahun ?>.
-                                </td>
-                            </tr>
+                            <!-- DataTables akan otomatis menampilkan pesan kosong jika tidak ada tr di tbody -->
                         <?php endif; ?>
                     </tbody>
 
                     <!-- FOOTER TOTAL AKUMULASI VERTIKAL DI BARIS PALING BAWAH -->
                     <tfoot class="bg-[#050e1d] font-bold text-white border-t-2 border-[#1e2d4a]">
                         <tr>
-                            <td colspan="2" class="px-2 py-3 text-center align-middle uppercase tracking-widest text-[10px] text-blue-300 border-r border-[#1e2d4a]">
+                            <td colspan="2" class="px-2 py-3 !text-center align-middle uppercase tracking-widest text-[10px] text-blue-300 border-r border-[#1e2d4a]">
                                 Total Akumulasi
                             </td>
                             <?php for($b = 1; $b <= 12; $b++): ?>
-                                <td class="col-month col-month-<?= $b ?> px-1.5 py-3 text-center align-middle border-r border-[#1e2d4a]/40 text-blue-200" id="footSumMonth<?= $b ?>">
+                                <td class="col-month col-month-<?= $b ?> px-1.5 py-3 !text-center align-middle border-r border-[#1e2d4a]/40 text-blue-200" id="footSumMonth<?= $b ?>">
                                     <?= number_format($columnSums[$b], 0, ',', '.') ?>
                                 </td>
                             <?php endfor; ?>
-                            <td class="px-2 py-3 text-center align-middle text-emerald-400 bg-[#071329] border-r border-[#1e2d4a] text-[11px]" id="footGrandTotal">
+                            <td class="px-2 py-3 !text-center align-middle text-emerald-400 bg-[#071329] border-r border-[#1e2d4a] text-[11px]" id="footGrandTotal">
                                 <?= number_format($grandTotal, 0, ',', '.') ?>
                             </td>
                             <td class="bg-[#050e1d]"></td>
@@ -271,6 +252,34 @@
 
         $(document).ready(function() {
             refreshIcons();
+            
+            // Inisialisasi DataTables dengan konfigurasi filter entri
+            $('#tabelIzin').DataTable({
+                "pageLength": 5, // Default 5 baris
+                "lengthMenu": [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Semua Data"]],
+                "ordering": false, // Nonaktifkan sorting agar urutan nomor (PHP) & kalkulasi tfoot tidak terganggu
+                "language": {
+                    "lengthMenu": "Tampilkan _MENU_ data",
+                    "info": "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+                    "infoEmpty": "Menampilkan 0 s/d 0 dari 0 data",
+                    "search": "Cari:",
+                    "paginate": {
+                        "first": "Awal",
+                        "last": "Akhir",
+                        "next": "Lanjut",
+                        "previous": "Kembali"
+                    },
+                    "emptyTable": "Belum ada data Jenis Perizinan yang tersimpan untuk Tahun ini."
+                },
+                "drawCallback": function(settings) {
+                    // Wajib dipanggil saat ganti halaman / ganti entri 
+                    // agar kolom bulan yang disembunyikan tetap tertata rapi
+                    updateTableColumns();
+                    refreshIcons();
+                }
+            });
+
+            // Panggil sekali untuk menyesuaikan tampilan bulan awal
             updateTableColumns();
         });
 
@@ -342,9 +351,9 @@
             const startM = parseInt($('#startMonth').val());
             const endM = parseInt($('#endMonth').val());
 
-            $('.col-month').hide();
-            for (let b = 1; b <= 12; b++) {
-                if (b >= startM && b <= endM) { $(`.col-month-${b}`).show(); }
+            $('.col-month').addClass('hidden');
+            for (let b = startM; b <= endM; b++) {
+                $(`.col-month-${b}`).removeClass('hidden');
             }
         }
 
@@ -786,7 +795,12 @@
                 footRow.push(grandTotalPDF.toLocaleString('id-ID'));
 
                 doc.autoTable({
-                    startY: 54, head: [tableHeaders], body: tableBody, foot: [footRow], theme: 'grid',
+                    startY: 54, 
+                    head: [tableHeaders], 
+                    body: tableBody, 
+                    foot: [footRow], 
+                    theme: 'grid',
+                    showFoot: 'lastPage', // Diperbarui menjadi 'lastPage' (tanpa underscore)
                     headStyles: { fillColor: [146, 205, 220], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center', valign: 'middle', lineWidth: 0.2, lineColor: [0, 0, 0], fontSize: 8 },
                     bodyStyles: { textColor: [0, 0, 0], lineWidth: 0.2, lineColor: [0, 0, 0], fontSize: 8 },
                     footStyles: { fillColor: [220, 230, 241], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center', lineWidth: 0.2, lineColor: [0, 0, 0], fontSize: 8 },
