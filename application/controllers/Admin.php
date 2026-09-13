@@ -257,19 +257,27 @@ class Admin extends CI_Controller {
     }
 
     // ==========================================
-    // BAGIAN PROFIL USAHA (DIPERBARUI DENGAN HIERARKI LOKASI)
+    // BAGIAN PROFIL USAHA (DENGAN FILTER JENIS & SEKTOR)
     // ==========================================
     
     public function ProfilUsaha() {
+        // Menerima input filter GET
         $tahun_get = $this->input->get('tahun');
-        $tahun = !empty($tahun_get) ? (int)$tahun_get : (int)date('Y');
-        $data['tahun_filter'] = $tahun;
+        $jenis_usaha_get = $this->input->get('jenis_usaha');
+        $sektor_usaha_get = $this->input->get('sektor_usaha');
 
-        // Ambil Data Provinsi (Format ID 2 Digit) untuk dropdown awal
+        $tahun = !empty($tahun_get) ? (int)$tahun_get : (int)date('Y');
+        
+        // Pass filter aktif kembali ke View
+        $data['tahun_filter'] = $tahun;
+        $data['jenis_filter'] = !empty($jenis_usaha_get) ? $jenis_usaha_get : 'Semua';
+        $data['sektor_filter'] = !empty($sektor_usaha_get) ? $sektor_usaha_get : 'Semua';
+
+        // Dropdown Provinsi Awal
         $this->db->where('LENGTH(id)', 2);
         $data['provinsi_list'] = $this->db->get('Distrik')->result();
 
-        // Query Profil Usaha (Join ke 4 level lokasi: Provinsi, Kab, Distrik, Kampung)
+        // Query Utama Profil Usaha
         $this->db->select('ProfilUsaha.*, 
                            P.NamaDistrik as NamaProvinsi, 
                            K.NamaDistrik as NamaKabupaten, 
@@ -280,9 +288,20 @@ class Admin extends CI_Controller {
         $this->db->join('Distrik K', 'K.id = ProfilUsaha.id_kabupaten', 'left');
         $this->db->join('Distrik D', 'D.id = ProfilUsaha.id_distrik', 'left');
         $this->db->join('Distrik V', 'V.id = ProfilUsaha.id_kampung', 'left');
+        
         $this->db->where('ProfilUsaha.Tahun', $tahun);
+        
+        // Aplikasikan Filter Query Jika Dipilih
+        if (!empty($jenis_usaha_get) && $jenis_usaha_get !== 'Semua') {
+            $this->db->where('ProfilUsaha.JenisUsaha', $jenis_usaha_get);
+        }
+        if (!empty($sektor_usaha_get) && $sektor_usaha_get !== 'Semua') {
+            $this->db->where('ProfilUsaha.SektorUsaha', $sektor_usaha_get);
+        }
+
         $this->db->where('ProfilUsaha.DeleteAt IS NULL', null, false);
         $this->db->order_by('ProfilUsaha.id', 'DESC');
+        
         $data['profil_usaha_data'] = $this->db->get()->result();
 
         $data['title'] = 'Profil Usaha - Admin SINTAMIKA';
@@ -290,16 +309,15 @@ class Admin extends CI_Controller {
         $this->load->view('Admin/ProfilUsaha', $data);
     }
 
-    // AJAX Endpoint untuk memuat Child Lokasi
     public function get_lokasi_anak($id_parent) {
         if (ob_get_level() > 0) ob_clean(); 
         
         $len = strlen($id_parent);
         $target_len = 0;
         
-        if ($len == 2) $target_len = 5;      // Kabupaten (misal 91.03 = 5 karakter)
-        elseif ($len == 5) $target_len = 8;  // Distrik (misal 91.03.01 = 8 karakter)
-        elseif ($len == 8) $target_len = 13; // Kampung (misal 91.03.01.2001 = 13 karakter)
+        if ($len == 2) $target_len = 5;      
+        elseif ($len == 5) $target_len = 8;  
+        elseif ($len == 8) $target_len = 13; 
         
         if ($target_len > 0) {
             $this->db->select('id, NamaDistrik');
@@ -335,6 +353,7 @@ class Admin extends CI_Controller {
 
         $data = array(
             'NIB' => $this->input->post('NIB'),
+            'JenisUsaha' => $this->input->post('JenisUsaha'), // MENERIMA INPUT JENIS USAHA BARU
             'NamaUsaha' => $this->input->post('NamaUsaha'),
             'NamaPemilik' => $this->input->post('NamaPemilik'),
             'SektorUsaha' => $this->input->post('SektorUsaha'), 

@@ -21,25 +21,56 @@
 
                 <div class="admin-panel flex flex-col">
                     
-                    <!-- FILTER TAHUN & TOMBOL EXPORT -->
-                    <div class="p-5 border-b border-[#1e2d4a] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#081122] rounded-t-[0.75rem]">
-                        <form action="<?= base_url('Admin/ProfilUsaha') ?>" method="GET" class="flex items-center gap-2">
-                            <label class="text-xs text-slate-400 font-medium uppercase">Filter Tahun:</label>
-                            <input type="number" name="tahun" id="filterTahun" value="<?= isset($tahun_filter) ? $tahun_filter : date('Y') ?>" class="w-24 bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2" min="2016" maxlength="4">
-                            <button type="submit" class="bg-[#1e2d4a] hover:bg-[#2e4063] text-white p-2 rounded-lg transition-colors">
-                                <i data-lucide="search" class="w-4 h-4"></i>
+                    <!-- FILTER DATA & TOMBOL EXPORT -->
+                    <div class="p-5 border-b border-[#1e2d4a] flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-[#081122] rounded-t-[0.75rem]">
+                        <form action="<?= base_url('Admin/ProfilUsaha') ?>" method="GET" class="flex flex-wrap items-center gap-3">
+                            <div class="flex items-center gap-2">
+                                <label class="text-[10px] text-slate-400 font-medium uppercase hidden sm:block">Tahun:</label>
+                                <input type="number" name="tahun" id="filterTahun" value="<?= isset($tahun_filter) ? $tahun_filter : date('Y') ?>" class="w-20 bg-[#050e1d] border border-[#1e2d4a] text-white text-xs rounded-md focus:ring-1 focus:ring-teal-500 outline-none p-2" min="2016" maxlength="4">
+                            </div>
+                            
+                            <div class="flex items-center gap-2">
+                                <label class="text-[10px] text-slate-400 font-medium uppercase hidden sm:block">Jenis:</label>
+                                <select name="jenis_usaha" id="filterJenis" class="bg-[#050e1d] border border-[#1e2d4a] text-white text-xs rounded-md focus:ring-1 focus:ring-teal-500 outline-none p-2">
+                                    <option value="Semua" <?= (isset($jenis_filter) && $jenis_filter == 'Semua') ? 'selected' : '' ?>>Semua Jenis</option>
+                                    <option value="PT" <?= (isset($jenis_filter) && $jenis_filter == 'PT') ? 'selected' : '' ?>>PT</option>
+                                    <option value="CV" <?= (isset($jenis_filter) && $jenis_filter == 'CV') ? 'selected' : '' ?>>CV</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <label class="text-[10px] text-slate-400 font-medium uppercase hidden sm:block">Sektor:</label>
+                                <select name="sektor_usaha" id="filterSektor" class="bg-[#050e1d] border border-[#1e2d4a] text-white text-xs rounded-md focus:ring-1 focus:ring-teal-500 outline-none p-2 max-w-[150px] sm:max-w-[200px]">
+                                    <option value="Semua" <?= (isset($sektor_filter) && $sektor_filter == 'Semua') ? 'selected' : '' ?>>Semua Sektor</option>
+                                    <option value="Pertanian & Perkebunan" <?= (isset($sektor_filter) && $sektor_filter == 'Pertanian & Perkebunan') ? 'selected' : '' ?>>Pertanian & Perkebunan</option>
+                                    <option value="Pertambangan & Penggalian" <?= (isset($sektor_filter) && $sektor_filter == 'Pertambangan & Penggalian') ? 'selected' : '' ?>>Pertambangan & Penggalian</option>
+                                    <option value="Industri Pengolahan" <?= (isset($sektor_filter) && $sektor_filter == 'Industri Pengolahan') ? 'selected' : '' ?>>Industri Pengolahan</option>
+                                    <option value="Konstruksi" <?= (isset($sektor_filter) && $sektor_filter == 'Konstruksi') ? 'selected' : '' ?>>Konstruksi</option>
+                                    <option value="Perdagangan Besar & Eceran" <?= (isset($sektor_filter) && $sektor_filter == 'Perdagangan Besar & Eceran') ? 'selected' : '' ?>>Perdagangan Besar & Eceran</option>
+                                    <option value="Transportasi & Pergudangan" <?= (isset($sektor_filter) && $sektor_filter == 'Transportasi & Pergudangan') ? 'selected' : '' ?>>Transportasi & Pergudangan</option>
+                                    <option value="Penyediaan Akomodasi & Makan Minum" <?= (isset($sektor_filter) && $sektor_filter == 'Penyediaan Akomodasi & Makan Minum') ? 'selected' : '' ?>>Penyediaan Akomodasi & Makan Minum</option>
+                                    <option value="Informasi & Komunikasi" <?= (isset($sektor_filter) && $sektor_filter == 'Informasi & Komunikasi') ? 'selected' : '' ?>>Informasi & Komunikasi</option>
+                                    <option value="Jasa Keuangan & Asuransi" <?= (isset($sektor_filter) && $sektor_filter == 'Jasa Keuangan & Asuransi') ? 'selected' : '' ?>>Jasa Keuangan & Asuransi</option>
+                                    <option value="Jasa Kesehatan" <?= (isset($sektor_filter) && $sektor_filter == 'Jasa Kesehatan') ? 'selected' : '' ?>>Jasa Kesehatan</option>
+                                    <option value="Jasa Pendidikan" <?= (isset($sektor_filter) && $sektor_filter == 'Jasa Pendidikan') ? 'selected' : '' ?>>Jasa Pendidikan</option>
+                                    <option value="Sektor Lainnya" <?= (isset($sektor_filter) && $sektor_filter == 'Sektor Lainnya') ? 'selected' : '' ?>>Sektor Lainnya</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="bg-[#1e2d4a] hover:bg-[#2e4063] text-white p-1.5 px-3 rounded-md transition-colors flex items-center gap-1.5 text-xs font-semibold">
+                                <i data-lucide="search" class="w-3.5 h-3.5"></i>
                             </button>
                         </form>
 
-                        <div class="flex items-center gap-2">
-                            <button onclick="downloadExcel()" class="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg px-3 py-2 text-sm transition-all shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Excel
+                        <div class="flex items-center gap-2 mt-4 xl:mt-0 w-full xl:w-auto justify-end">
+                            <button onclick="downloadExcel()" class="flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-md px-2.5 py-1.5 text-xs transition-all shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                                <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Excel
                             </button>
-                            <button onclick="downloadPDF()" class="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-lg px-3 py-2 text-sm transition-all shadow-[0_0_10px_rgba(239,68,68,0.2)]">
-                                <i data-lucide="file-text" class="w-4 h-4"></i> PDF
+                            <button onclick="downloadPDF()" class="flex items-center justify-center gap-1.5 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-md px-2.5 py-1.5 text-xs transition-all shadow-[0_0_10px_rgba(239,68,68,0.2)]">
+                                <i data-lucide="file-text" class="w-3.5 h-3.5"></i> PDF
                             </button>
-                            <button onclick="openModal()" class="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-lg px-4 py-2 text-sm transition-all shadow-[0_0_15px_rgba(13,148,136,0.3)] ml-2">
-                                <i data-lucide="plus" class="w-4 h-4"></i> Tambah Pelaku Usaha
+                            <button onclick="openModal()" class="flex items-center justify-center gap-1.5 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-md px-2.5 py-1.5 text-xs transition-all shadow-[0_0_15px_rgba(13,148,136,0.3)] ml-2">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Profil Usaha
                             </button>
                         </div>
                     </div>
@@ -63,7 +94,12 @@
                                         <td class="px-4 py-3 text-center font-medium text-slate-500"><?= $index + 1 ?></td>
 
                                         <td class="px-4 py-3 whitespace-normal break-words max-w-[200px]">
-                                            <div class="text-white font-bold text-sm mb-0.5"><?= htmlspecialchars($row->NamaUsaha) ?></div>
+                                            <div class="text-white font-bold text-sm mb-0.5">
+                                                <?php if(!empty($row->JenisUsaha) && $row->JenisUsaha != 'Lainnya'): ?>
+                                                    <span class="text-teal-400"><?= htmlspecialchars($row->JenisUsaha) ?> 
+                                                <?php endif; ?>
+                                                <?= htmlspecialchars($row->NamaUsaha) ?></span>
+                                            </div>
                                             <div class="text-xs text-blue-400 font-mono tracking-wider">NIB: <?= htmlspecialchars($row->NIB) ?></div>
                                         </td>
                                         
@@ -111,7 +147,7 @@
         <div id="modalCRUD" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
             <div class="absolute inset-0 bg-[#030816]/80 backdrop-blur-sm transition-opacity duration-300" onclick="closeModal()"></div>
             
-            <div id="modalContent" class="relative w-full max-w-[650px] bg-[#0b172e] border border-[#1e2d4a] rounded-xl shadow-2xl flex flex-col transition-all duration-300 modal-leave h-[90vh] md:h-auto overflow-hidden">
+            <div id="modalContent" class="relative w-full max-w-[700px] bg-[#0b172e] border border-[#1e2d4a] rounded-xl shadow-2xl flex flex-col transition-all duration-300 modal-leave h-[90vh] md:h-auto overflow-hidden">
                 
                 <div class="flex items-center justify-between p-5 border-b border-[#1e2d4a]/80 bg-[#071126] rounded-t-xl shrink-0">
                     <h3 id="modalTitle" class="text-white font-bold text-sm tracking-wide">Tambah Profil Usaha</h3>
@@ -127,20 +163,28 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="space-y-4">
                                 <div class="space-y-1.5">
-                                    <label class="text-[11px] font-semibold text-slate-300 uppercase block">Tahun Pendataan</label>
-                                    <input type="number" id="inputTahun" name="Tahun" placeholder="Misal: 2024" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required min="2016" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);" maxlength="4">
+                                    <label class="text-[11px] font-semibold text-slate-300 uppercase block">Tahun Data</label>
+                                    <input type="number" id="inputTahun" name="Tahun" placeholder="2024" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required min="2016" oninput="if(this.value.length > 4) this.value = this.value.slice(0,4);" maxlength="4">
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="text-[11px] font-semibold text-slate-300 uppercase block">Jenis Usaha</label>
+                                    <select id="inputJenisUsaha" name="JenisUsaha" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required>
+                                        <option value="">-- Pilih --</option>
+                                        <option value="PT">PT</option>
+                                        <option value="CV">CV</option>
+                                    </select>
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-[11px] font-semibold text-slate-300 uppercase block">Nomor Induk Berusaha (NIB)</label>
                                     <input type="text" id="inputNIB" name="NIB" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required>
                                 </div>
+                            </div>
+                            
+                            <div class="space-y-4">
                                 <div class="space-y-1.5">
                                     <label class="text-[11px] font-semibold text-slate-300 uppercase block">Nama Perusahaan / Usaha</label>
                                     <input type="text" id="inputNamaUsaha" name="NamaUsaha" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required>
                                 </div>
-                            </div>
-                            
-                            <div class="space-y-4">
                                 <div class="space-y-1.5">
                                     <label class="text-[11px] font-semibold text-slate-300 uppercase block">Nama Pemilik / Direktur</label>
                                     <input type="text" id="inputNamaPemilik" name="NamaPemilik" class="w-full bg-[#050e1d] border border-[#1e2d4a] text-white text-sm rounded-lg focus:ring-1 focus:ring-teal-500 outline-none p-2.5" required>
@@ -209,7 +253,7 @@
                     <div class="p-5 flex justify-end gap-3 border-t border-[#1e2d4a]/80 bg-[#071126] rounded-b-xl shrink-0">
                         <button type="button" onclick="closeModal()" class="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700">Batal</button>
                         <button type="submit" id="btnSubmitForm" class="px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-500 rounded-lg transition-colors shadow-lg shadow-teal-900/40 border border-teal-500/50 flex items-center gap-2">
-                            <i data-lucide="save" class="w-4 h-4"></i> Simpan Data Profil
+                            <i data-lucide="save" class="w-4 h-4"></i> Simpan Data
                         </button>
                     </div>
                 </form>
@@ -220,6 +264,8 @@
     <script>
         const dataProfilExport = <?= !empty($profil_usaha_data) ? json_encode($profil_usaha_data) : '[]' ?>;
         const currentTahunFilter = $('#filterTahun').val();
+        const currentJenisFilter = $('#filterJenis').val();
+        const currentSektorFilter = $('#filterSektor').val();
         const monthNamesIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
         document.addEventListener("DOMContentLoaded", function() {
@@ -231,7 +277,7 @@
                         search: "Cari Data:", lengthMenu: "Tampilkan _MENU_ entri",
                         info: "Menampilkan _START_ hingga _END_ dari _TOTAL_ profil",
                         infoEmpty: "Menampilkan 0 profil", infoFiltered: "(difilter)",
-                        emptyTable: "Belum ada data Profil Usaha untuk tahun terpilih.",
+                        emptyTable: "Belum ada data Profil Usaha untuk filter terpilih.",
                         paginate: { first: "Awal", last: "Akhir", next: "Lanjut", previous: "Kembali" }
                     }
                 });
@@ -292,7 +338,6 @@
                 $('#inputId').val(''); 
                 $('#inputTahun').val(currentTahunFilter);
                 
-                // Reset select cascading agar disable kembali
                 $('#inputIdKabupaten').html('<option value="">-- Pilih Kabupaten --</option>').prop('disabled', true);
                 $('#inputIdDistrik').html('<option value="">-- Pilih Distrik --</option>').prop('disabled', true);
                 $('#inputIdKampung').html('<option value="">-- Pilih Kampung --</option>').prop('disabled', true);
@@ -306,7 +351,6 @@
 
         async function editProfil(id) {
             try {
-                // Tampilkan loading spinner agar user tahu proses get sedang berlangsung
                 Swal.fire({
                     title: 'Memuat Data...',
                     allowOutsideClick: false, background: '#0b172e', color: '#fff',
@@ -319,13 +363,13 @@
                     $('#modalTitle').text('Edit Profil Usaha');
                     $('#inputId').val(res.data.id);
                     $('#inputTahun').val(res.data.Tahun);
+                    $('#inputJenisUsaha').val(res.data.JenisUsaha || 'Lainnya');
                     $('#inputNIB').val(res.data.NIB);
                     $('#inputNamaUsaha').val(res.data.NamaUsaha);
                     $('#inputNamaPemilik').val(res.data.NamaPemilik);
                     $('#inputSektorUsaha').val(res.data.SektorUsaha);
                     $('#inputAlamat').val(res.data.Alamat);
                     
-                    // Set hierarki Provinsi - Kampung 
                     $('#inputIdProvinsi').val(res.data.id_provinsi);
                     
                     if(res.data.id_provinsi) {
@@ -338,7 +382,7 @@
                         }
                     }
                     
-                    Swal.close(); // tutup modal loading
+                    Swal.close(); 
                     openModal(true); 
                 } else {
                     Swal.fire({ icon: 'error', title: 'Gagal!', text: res.message, background: '#0b172e', color: '#fff' });
@@ -393,16 +437,23 @@
             });
         }
 
+        // ==========================================
+        // EXPORT LOGIC WITH FILTERED TITLES
+        // ==========================================
+        function getDynamicTitleStr() {
+            let info = `TAHUN ${currentTahunFilter}`;
+            if(currentJenisFilter !== 'Semua') info += ` | JENIS: ${currentJenisFilter}`;
+            if(currentSektorFilter !== 'Semua') info += ` | SEKTOR: ${currentSektorFilter.toUpperCase()}`;
+            return info;
+        }
+
         async function downloadExcel() {
             if (typeof window.ExcelJS === 'undefined') {
                 alert("Library ExcelJS belum termuat. Pastikan koneksi internet stabil."); return;
             }
 
-            const rentangText = `TAHUN ${currentTahunFilter}`;
             const workbook = new window.ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Profil Usaha');
-            
-            // Kolom diperbesar hingga J (10 Kolom)
             const totalCols = 10; 
             const lastColLetter = 'J';
 
@@ -432,15 +483,20 @@
 
             worksheet.addRow([]); 
 
-            worksheet.addRow([`REKAPITULASI PROFIL USAHA ${rentangText}`]);
+            worksheet.addRow([`REKAPITULASI PROFIL USAHA`]);
             worksheet.mergeCells(`A7:${lastColLetter}7`);
             worksheet.getCell('A7').font = { name: 'Arial', size: 12, bold: true };
             worksheet.getCell('A7').alignment = { vertical: 'middle', horizontal: 'center' };
 
+            worksheet.addRow([getDynamicTitleStr()]);
+            worksheet.mergeCells(`A8:${lastColLetter}8`);
+            worksheet.getCell('A8').font = { name: 'Arial', size: 11, bold: true };
+            worksheet.getCell('A8').alignment = { vertical: 'middle', horizontal: 'center' };
+
             worksheet.addRow([]); 
 
-            // Header Tabel Update
-            let headers = ['NO', 'NIB', 'NAMA USAHA', 'PEMILIK', 'SEKTOR USAHA', 'PROVINSI', 'KABUPATEN', 'DISTRIK', 'KAMPUNG', 'ALAMAT'];
+            // Header Tabel
+            let headers = ['NO', 'NIB', 'NAMA USAHA (JENIS)', 'PEMILIK', 'SEKTOR USAHA', 'PROVINSI', 'KABUPATEN', 'DISTRIK', 'KAMPUNG', 'ALAMAT'];
             const headerRow = worksheet.addRow(headers);
             
             headerRow.eachCell((cell) => {
@@ -452,8 +508,11 @@
 
             if (dataProfilExport.length > 0) {
                 dataProfilExport.forEach((item, index) => {
+                    const prefix = (item.JenisUsaha && item.JenisUsaha !== 'Lainnya') ? `${item.JenisUsaha}. ` : '';
+                    const fullNamaUsaha = prefix + item.NamaUsaha;
+
                     const rowData = [
-                        (index + 1), item.NIB, item.NamaUsaha, 
+                        (index + 1), item.NIB, fullNamaUsaha, 
                         item.NamaPemilik, (item.SektorUsaha || '-'), 
                         (item.NamaProvinsi || '-'), (item.NamaKabupaten || '-'), 
                         (item.NamaDistrik || '-'), (item.NamaKampung || '-'), 
@@ -481,7 +540,7 @@
             
             const now = new Date();
             const dateStr = `${now.getDate()} ${monthNamesIndo[now.getMonth()]} ${now.getFullYear()}`;
-            const sigStartCol = 8; // Geser ke kanan
+            const sigStartCol = 8; 
             
             const addSigLine = (text, bold = false) => {
                 const row = worksheet.addRow([]);
@@ -502,7 +561,6 @@
             addSigLine('Pembina TK. I');
             addSigLine('NIP : 196805141989111002');
 
-            // Lebar Kolom
             worksheet.columns = [
                 { width: 6 },  { width: 20 }, { width: 35 }, 
                 { width: 25 }, { width: 30 }, { width: 20 }, 
@@ -515,7 +573,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Rekap_Profil_Usaha_Mimika_TAHUN_${currentTahunFilter}.xlsx`;
+            a.download = `Rekap_Profil_Usaha_Mimika_${currentTahunFilter}.xlsx`;
             document.body.appendChild(a); a.click(); document.body.removeChild(a); window.URL.revokeObjectURL(url);
         }
 
@@ -565,18 +623,21 @@
                 doc.setLineWidth(0.3); doc.line(15, 38.5, 282, 38.5);
 
                 doc.setFont("helvetica", "bold"); doc.setFontSize(11);
-                const titleText = `REKAPITULASI PROFIL USAHA TAHUN ${currentTahunFilter}`;
-                doc.text(titleText, 148, 47, { align: "center" });
+                doc.text("REKAPITULASI PROFIL USAHA", 148, 47, { align: "center" });
                 
-                // Meringkas Kolom agar muat di PDF (Lokasi digabung jadi 1 sel per baris)
-                let tableHeaders = ['NO', 'NIB', 'NAMA USAHA', 'PEMILIK', 'SEKTOR USAHA', 'LOKASI (PROV-KMP)', 'ALAMAT'];
+                doc.setFontSize(9);
+                doc.text(getDynamicTitleStr(), 148, 52, { align: "center" });
+                
+                let tableHeaders = ['NO', 'NIB', 'NAMA USAHA (JENIS)', 'PEMILIK', 'SEKTOR USAHA', 'LOKASI (PROV-KMP)', 'ALAMAT'];
                 let tableBody = [];
 
                 if (dataProfilExport.length > 0) {
                     dataProfilExport.forEach((item, index) => {
+                        const prefix = (item.JenisUsaha && item.JenisUsaha !== 'Lainnya') ? `${item.JenisUsaha}. ` : '';
+                        const fullNamaUsaha = prefix + item.NamaUsaha;
                         const strLokasi = `${item.NamaProvinsi||'-'}\nKab. ${item.NamaKabupaten||'-'}\nKec. ${item.NamaDistrik||'-'}\nDs. ${item.NamaKampung||'-'}`;
                         tableBody.push([
-                            (index + 1).toString(), item.NIB, item.NamaUsaha, 
+                            (index + 1).toString(), item.NIB, fullNamaUsaha, 
                             item.NamaPemilik, (item.SektorUsaha || '-'), strLokasi, item.Alamat
                         ]);
                     });
@@ -585,7 +646,7 @@
                 }
 
                 doc.autoTable({
-                    startY: 54, head: [tableHeaders], body: tableBody, theme: 'grid',
+                    startY: 57, head: [tableHeaders], body: tableBody, theme: 'grid',
                     headStyles: { fillColor: [146, 205, 220], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center', valign: 'middle', lineWidth: 0.2, lineColor: [0, 0, 0], fontSize: 8 },
                     bodyStyles: { textColor: [0, 0, 0], lineWidth: 0.2, lineColor: [0, 0, 0], fontSize: 8, valign: 'top' },
                     columnStyles: { 
@@ -616,7 +677,7 @@
                 doc.text("Pembina TK. I", rightMargin, signatureY + 5);
                 doc.text("NIP : 196805141989111002", rightMargin, signatureY + 10);
 
-                doc.save(`Rekap_Profil_Usaha_Mimika_TAHUN_${currentTahunFilter}.pdf`);
+                doc.save(`Rekap_Profil_Usaha_Mimika_${currentTahunFilter}.pdf`);
                 Swal.close();
             } catch (error) {
                 console.error(error);

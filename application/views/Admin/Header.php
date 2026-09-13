@@ -139,7 +139,7 @@
             
             <a href="<?= base_url('Admin/JenisIzin') ?>" class="sidebar-menu-item <?= ($current_uri == 'JenisIzin') ? 'active' : '' ?> flex items-center gap-3 px-6 py-3 text-sm text-slate-400 border-left border-transparent">
                 <i data-lucide="file-signature" class="w-5 h-5 shrink-0"></i>
-                <span class="sidebar-text">Jenis Perizinan</span>
+                <span class="sidebar-text">Rekap Jenis Perizinan</span>
             </a>
 
             <!-- Icon diubah menjadi 'layers' (atau 'clipboard-list' / 'building-2') agar sesuai dengan Rekap Data MPP Hierarkis -->
