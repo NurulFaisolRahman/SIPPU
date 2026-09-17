@@ -6,38 +6,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($title) ? $title : 'Admin Dashboard - SINTAMIKA Mimika' ?></title>
     
-    <!-- Favicon standar untuk sebagian besar browser modern -->
+    <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="https://upload.wikimedia.org/wikipedia/commons/1/10/Lambang_Kabupaten_Mimika.jpg">
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    
+
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest" crossorigin="anonymous"></script>
 
-    <!-- SweetAlert2 (Untuk Notifikasi CRUD) -->
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" crossorigin="anonymous"></script>
 
-    <!-- Google APIs jQuery 3.7.1 -->
+    <!-- jQuery 3.7.1 -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    
-    <!-- jsPDF & AutoTable untuk Export PDF -->
+
+    <!-- jsPDF & AutoTable -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- ExcelJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 
     <!-- DataTables CSS/JS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" crossorigin="anonymous">
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
 
     <style>
-        /* Background & Global Font */
         body { 
             background-color: #030816; 
             color: #e2e8f0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        /* Glass Panel Khusus Tabel & Card */
         .admin-panel { 
             background-color: #0a1329; 
             border: 1px solid #1a2c4e; 
@@ -45,16 +46,15 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
         }
 
-        /* Sidebar Styling & Animasi Toggle */
         #sidebar {
-            width: 16rem; /* w-64 = 16rem */
+            width: 16rem;
             transition: width 0.3s ease-in-out;
         }
         #sidebar.collapsed {
-            width: 4.5rem; /* Lebar mini saat disembunyikan */
+            width: 4.5rem;
         }
         #sidebar.collapsed .sidebar-text {
-            display: none; /* Sembunyikan teks */
+            display: none !important;
         }
         #sidebar.collapsed .sidebar-header {
             padding: 0;
@@ -78,17 +78,14 @@
         }
         .sidebar-menu-item.active i { color: #60a5fa; }
 
-        /* Scrollbar Halus */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
 
-        /* Animasi Modal */
         .modal-enter { opacity: 1; transform: scale(1); }
         .modal-leave { opacity: 0; transform: scale(0.95); }
 
-        /* Custom Styling untuk DataTables (Dark Mode Integration) */
         .dataTables_wrapper { padding: 1rem 1.25rem; }
         .dataTables_wrapper .dataTables_length, 
         .dataTables_wrapper .dataTables_filter,
@@ -137,10 +134,34 @@
             <!-- Cek aktif menu -->
             <?php $current_uri = $this->uri->segment(2); ?>
             
-            <a href="<?= base_url('Admin/JenisIzin') ?>" class="sidebar-menu-item <?= ($current_uri == 'JenisIzin') ? 'active' : '' ?> flex items-center gap-3 px-6 py-3 text-sm text-slate-400 border-left border-transparent">
-                <i data-lucide="file-signature" class="w-5 h-5 shrink-0"></i>
-                <span class="sidebar-text">Rekap Jenis Perizinan</span>
-            </a>
+            <!-- GROUP DROPDOWN: JENIS PERIZINAN -->
+            <?php 
+                $perizinan_active = in_array($current_uri, ['JenisIzin', 'DataSiujk', 'DataSiup', 'DataPbg']); 
+            ?>
+            <div>
+                <button type="button" onclick="toggleSubmenu('sub-perizinan')" class="sidebar-menu-item w-full flex items-center justify-between px-6 py-3 text-sm text-slate-400 border-left border-transparent focus:outline-none <?= $perizinan_active ? 'active' : '' ?>">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="file-signature" class="w-5 h-5 shrink-0"></i>
+                        <span class="sidebar-text font-medium">Data Perizinan</span>
+                    </div>
+                    <i data-lucide="chevron-down" id="arrow-sub-perizinan" class="w-4 h-4 shrink-0 sidebar-text transition-transform duration-200 <?= $perizinan_active ? 'rotate-180' : '' ?>"></i>
+                </button>
+                
+                <div id="sub-perizinan" class="sidebar-text pl-11 space-y-1 my-1 <?= $perizinan_active ? '' : 'hidden' ?>">
+                    <a href="<?= base_url('Admin/JenisIzin') ?>" class="flex items-center gap-2 py-2 px-3 text-xs rounded-lg transition-colors <?= ($current_uri == 'JenisIzin') ? 'text-blue-400 font-bold bg-blue-500/10 border border-blue-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' ?>">
+                        <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 shrink-0"></i> Rekap Perizinan
+                    </a>
+                    <a href="<?= base_url('Admin/DataSiujk') ?>" class="flex items-center gap-2 py-2 px-3 text-xs rounded-lg transition-colors <?= ($current_uri == 'DataSiujk') ? 'text-blue-400 font-bold bg-blue-500/10 border border-blue-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' ?>">
+                        <i data-lucide="hard-hat" class="w-3.5 h-3.5 shrink-0"></i> Data SIUJK
+                    </a>
+                    <a href="<?= base_url('Admin/DataSiup') ?>" class="flex items-center gap-2 py-2 px-3 text-xs rounded-lg transition-colors <?= ($current_uri == 'DataSiup') ? 'text-blue-400 font-bold bg-blue-500/10 border border-blue-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' ?>">
+                        <i data-lucide="store" class="w-3.5 h-3.5 shrink-0"></i> Data SIUP
+                    </a>
+                    <a href="<?= base_url('Admin/DataPbg') ?>" class="flex items-center gap-2 py-2 px-3 text-xs rounded-lg transition-colors <?= ($current_uri == 'DataPbg') ? 'text-blue-400 font-bold bg-blue-500/10 border border-blue-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' ?>">
+                        <i data-lucide="building" class="w-3.5 h-3.5 shrink-0"></i> Data PBG
+                    </a>
+                </div>
+            </div>
 
             <!-- Icon diubah menjadi 'layers' (atau 'clipboard-list' / 'building-2') agar sesuai dengan Rekap Data MPP Hierarkis -->
             <a href="<?= base_url('Admin/OpdInstansi') ?>" class="sidebar-menu-item <?= ($current_uri == 'OpdInstansi') ? 'active' : '' ?> flex items-center gap-3 px-6 py-3 text-sm text-slate-400 border-left border-transparent">
@@ -157,6 +178,21 @@
             <a href="<?= base_url('Admin/DataInvestasi') ?>" class="sidebar-menu-item <?= ($current_uri == 'DataInvestasi') ? 'active' : '' ?> flex items-center gap-3 px-6 py-3 text-sm text-slate-400 border-left border-transparent">
                 <i data-lucide="trending-up" class="w-5 h-5 shrink-0"></i>
                 <span class="sidebar-text">Data Investasi</span>
+            </a>
+
+            <!-- Menu Tambahan Baru -->
+            <div class="px-6 py-2 mt-2 sidebar-text">
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Pengaturan</span>
+            </div>
+
+            <a href="<?= base_url('Admin/PengaturanAkun') ?>" class="sidebar-menu-item <?= ($current_uri == 'PengaturanAkun') ? 'active' : '' ?> flex items-center gap-3 px-6 py-3 text-sm text-slate-400 border-left border-transparent">
+                <i data-lucide="user-cog" class="w-5 h-5 shrink-0"></i>
+                <span class="sidebar-text">Pengaturan Akun</span>
+            </a>
+
+            <a href="<?= base_url('Admin/KepalaDinas') ?>" class="sidebar-menu-item <?= ($current_uri == 'KepalaDinas') ? 'active' : '' ?> flex items-center gap-3 px-6 py-3 text-sm text-slate-400 border-left border-transparent">
+                <i data-lucide="contact" class="w-5 h-5 shrink-0"></i>
+                <span class="sidebar-text">Data Kepala Dinas</span>
             </a>
         </nav>
 
@@ -205,15 +241,28 @@
             <!-- SCRIPT INISIALISASI & TOGGLE LOGIC -->
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
-                    // Render semua icon lucide
-                    lucide.createIcons();
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
 
-                    // Logika Toggle Sidebar
                     const sidebar = document.getElementById('sidebar');
                     const toggleBtn = document.getElementById('toggle-sidebar');
 
-                    toggleBtn.addEventListener('click', function() {
-                        sidebar.classList.toggle('collapsed');
-                    });
+                    if (toggleBtn && sidebar) {
+                        toggleBtn.addEventListener('click', function() {
+                            sidebar.classList.toggle('collapsed');
+                        });
+                    }
                 });
+
+                function toggleSubmenu(id) {
+                    const el = document.getElementById(id);
+                    const arrow = document.getElementById('arrow-' + id);
+                    if (el) {
+                        el.classList.toggle('hidden');
+                    }
+                    if (arrow) {
+                        arrow.classList.toggle('rotate-180');
+                    }
+                }
             </script>

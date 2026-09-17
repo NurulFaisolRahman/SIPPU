@@ -35,6 +35,7 @@
                                     <option value="Semua" <?= (isset($jenis_filter) && $jenis_filter == 'Semua') ? 'selected' : '' ?>>Semua Jenis</option>
                                     <option value="PT" <?= (isset($jenis_filter) && $jenis_filter == 'PT') ? 'selected' : '' ?>>PT</option>
                                     <option value="CV" <?= (isset($jenis_filter) && $jenis_filter == 'CV') ? 'selected' : '' ?>>CV</option>
+                                    <option value="Perorangan" <?= (isset($jenis_filter) && $jenis_filter == 'Perorangan') ? 'selected' : '' ?>>Perorangan</option>
                                 </select>
                             </div>
 
@@ -172,6 +173,7 @@
                                         <option value="">-- Pilih --</option>
                                         <option value="PT">PT</option>
                                         <option value="CV">CV</option>
+                                        <option value="Perorangan">Perorangan</option>
                                     </select>
                                 </div>
                                 <div class="space-y-1.5">

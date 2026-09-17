@@ -837,4 +837,496 @@ class Admin extends CI_Controller {
         return $this->output->set_content_type('application/json')
                             ->set_output(json_encode(['status' => 'success', 'message' => 'Rekap pelayanan berhasil disimpan.']));
     }
+
+    // ==========================================
+    // DATA KEPALA DINAS (TUNGGAL)
+    // ==========================================
+    public function KepalaDinas() {
+        $data['title'] = 'Data Kepala Dinas - Admin SINTAMIKA';
+        
+        // Ambil 1 baris data Kepala Dinas yang belum dihapus
+        $this->db->where('DeleteAt IS NULL', null, false);
+        $data['kadis'] = $this->db->get('KepalaDinas')->row();
+
+        $this->load->view('Admin/Header', $data);
+        $this->load->view('Admin/KepalaDinas', $data);
+    }
+
+    public function save_kepala_dinas() {
+        if (ob_get_level() > 0) ob_clean();
+        
+        $id = $this->input->post('id');
+        $nama = trim($this->input->post('Nama'));
+        $pangkat = trim($this->input->post('Pangkat'));
+        $nip = trim($this->input->post('NIP'));
+
+        if (empty($nama) || empty($nip)) {
+            return $this->output->set_content_type('application/json')
+                ->set_output(json_encode(['status' => 'error', 'message' => 'Nama dan NIP wajib diisi!']));
+        }
+
+        $data = array(
+            'Nama' => $nama,
+            'Pangkat' => $pangkat,
+            'NIP' => $nip
+        );
+
+        if (!empty($id)) {
+            $data['UpdatedAt'] = date('Y-m-d H:i:s');
+            $this->db->where('id', $id);
+            $update = $this->db->update('KepalaDinas', $data);
+        } else {
+            // Jaga-jaga jika database awal masih kosong
+            $data['InputAt'] = date('Y-m-d H:i:s');
+            $update = $this->db->insert('KepalaDinas', $data);
+        }
+
+        if ($update) {
+            return $this->output->set_content_type('application/json')
+                ->set_output(json_encode(['status' => 'success', 'message' => 'Data Kepala Dinas berhasil diperbarui!']));
+        } else {
+            return $this->output->set_content_type('application/json')
+                ->set_output(json_encode(['status' => 'error', 'message' => 'Gagal memperbarui data.']));
+        }
+    }
+
+    // ==========================================
+    // PENGATURAN AKUN (MENU BARU)
+    // ==========================================
+    public function PengaturanAkun() {
+        $data['title'] = 'Pengaturan Akun Admin - SINTAMIKA';
+        
+        // Asumsi admin hanya punya 1 akun
+        // Di sini kita ambil baris pertama dari tabel AkunAdmin
+        $data['akun'] = $this->db->get('AkunAdmin')->row(); 
+        
+        $this->load->view('Admin/Header', $data);
+        $this->load->view('Admin/PengaturanAkun', $data);
+    }
+
+    public function update_akun() {
+        if (ob_get_level() > 0) ob_clean();
+        
+        // Tangkap old_username dari hidden input form
+        $old_username = trim($this->input->post('old_username'));
+        $new_username = trim($this->input->post('username'));
+        $password = $this->input->post('password');
+
+        if (empty($new_username)) {
+            return $this->output->set_content_type('application/json')->set_output(json_encode(['status' => 'error', 'message' => 'Username tidak boleh kosong!']));
+        }
+
+        // Persiapkan data dengan key sesuai camelCase/PascalCase di DB
+        $data = array('Username' => $new_username);
+
+        // Jika password diisi, update password menggunakan password_hash
+        if (!empty($password)) {
+            $data['Password'] = password_hash($password, PASSWORD_DEFAULT);
+        }
+
+        // Pastikan kita memperbarui menggunakan 'old_username' sebagai patokan primary key
+        // Jika belum ada old_username (data kosong di DB), kita asumsikan insert? 
+        // Namun sesuai instruksi, ini adalah proses update
+        $this->db->where('Username', $old_username);
+        $update = $this->db->update('AkunAdmin', $data);
+
+        if ($update) {
+            // Update session jika sedang login menggunakan username baru
+            $this->session->set_userdata('admin_username', $new_username);
+            return $this->output->set_content_type('application/json')->set_output(json_encode(['status' => 'success', 'message' => 'Informasi Akun berhasil diperbarui.']));
+        } else {
+            return $this->output->set_content_type('application/json')->set_output(json_encode(['status' => 'error', 'message' => 'Gagal memperbarui informasi akun.']));
+        }
+    }
+
+    // ==========================================
+    // BAGIAN DATA SIUJK (IZIN USAHA JASA KONSTRUKSI)
+    // ==========================================
+
+    public function DataSiujk() {
+        // Menerima input filter GET
+        $tahun_get = $this->input->get('tahun');
+        $keterangan_get = $this->input->get('keterangan');
+
+        $tahun = !empty($tahun_get) ? (int)$tahun_get : (int)date('Y');
+        
+        // Pass filter aktif kembali ke View
+        $data['tahun_filter'] = $tahun;
+        $data['keterangan_filter'] = !empty($keterangan_get) ? $keterangan_get : 'Semua';
+
+        // Query Utama Data SIUJK
+        $this->db->select('*');
+        $this->db->from('DataSiujk');
+        $this->db->where('Tahun', $tahun);
+        
+        // Aplikasikan Filter Query Jika Dipilih
+        if (!empty($keterangan_get) && $keterangan_get !== 'Semua') {
+            $this->db->where('Keterangan', $keterangan_get);
+        }
+
+        $this->db->where('DeleteAt IS NULL', null, false);
+        $this->db->order_by('id', 'DESC');
+        
+        $data['siujk_data'] = $this->db->get()->result();
+
+        $data['title'] = 'Data SIUJK - Admin SINTAMIKA';
+        $this->load->view('Admin/Header', $data); // Pastikan Header di load
+        $this->load->view('Admin/DataSiujk', $data);
+    }
+
+    public function get_siujk($id) {
+        if (ob_get_level() > 0) ob_clean(); 
+        
+        $data = $this->db->where('id', $id)->where('DeleteAt IS NULL', null, false)->get('DataSiujk')->row();
+        
+        if ($data) {
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'success', 'data' => $data]));
+        } else {
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'error', 'message' => 'Data tidak ditemukan']));
+        }
+    }
+
+    public function save_siujk() {
+        if (ob_get_level() > 0) ob_clean(); 
+
+        $id = $this->input->post('id');
+        $tahun = $this->input->post('Tahun');
+
+        if (strlen((string)$tahun) !== 4 || (int)$tahun <= 2015) {
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'error', 'message' => 'Format Tahun salah. Harus 4 angka dan di atas tahun 2015.']));
+        }
+
+        $data = array(
+            'NomorAdvis' => $this->input->post('NomorAdvis'),
+            'NamaPerusahaan' => $this->input->post('NamaPerusahaan'),
+            'Jalan' => $this->input->post('Jalan'),
+            'KelDistrik' => $this->input->post('KelDistrik'),
+            'RtRw' => $this->input->post('RtRw'),
+            'NamaPenanggungjawab' => $this->input->post('NamaPenanggungjawab'),
+            'NpwpPerusahaan' => $this->input->post('NpwpPerusahaan'),
+            'MasaBerlaku' => $this->input->post('MasaBerlaku'),
+            'TanggalCetak' => $this->input->post('TanggalCetak'),
+            'Keterangan' => $this->input->post('Keterangan'),
+            'Tahun' => $tahun
+        );
+
+        $this->db->db_debug = FALSE;
+
+        if (empty($id)) {
+            $data['InputAt'] = date('Y-m-d H:i:s');
+            $insert = $this->db->insert('DataSiujk', $data);
+            if ($insert) {
+                return $this->output->set_content_type('application/json')
+                                    ->set_output(json_encode(['status' => 'success', 'message' => 'Data SIUJK berhasil ditambahkan!']));
+            } else {
+                $db_error = $this->db->error();
+                return $this->output->set_content_type('application/json')
+                                    ->set_output(json_encode(['status' => 'error', 'message' => 'Gagal menambah data: ' . $db_error['message']]));
+            }
+        } else {
+            $data['UpdatedAt'] = date('Y-m-d H:i:s');
+            $this->db->where('id', $id);
+            $update = $this->db->update('DataSiujk', $data);
+            if ($update) {
+                return $this->output->set_content_type('application/json')
+                                    ->set_output(json_encode(['status' => 'success', 'message' => 'Data SIUJK berhasil diperbarui!']));
+            } else {
+                $db_error = $this->db->error();
+                return $this->output->set_content_type('application/json')
+                                    ->set_output(json_encode(['status' => 'error', 'message' => 'Gagal memperbarui data: ' . $db_error['message']]));
+            }
+        }
+    }
+
+    public function delete_siujk($id) {
+        if (ob_get_level() > 0) ob_clean(); 
+        
+        $this->db->where('id', $id);
+        $this->db->db_debug = FALSE;
+        
+        // Soft delete
+        $update = $this->db->update('DataSiujk', ['DeleteAt' => date('Y-m-d H:i:s')]);
+        
+        if ($update) {
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'success', 'message' => 'Data SIUJK berhasil dihapus']));
+        } else {
+            $db_error = $this->db->error();
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'error', 'message' => 'Gagal menghapus data: ' . $db_error['message']]));
+        }
+    }
+
+    // ==========================================
+    // BAGIAN DATA SIUP (SURAT IZIN USAHA PERDAGANGAN)
+    // ==========================================
+
+    public function DataSiup() {
+        // Menerima input filter dari URL (GET)
+        $tahun_get = $this->input->get('tahun');
+        $kelembagaan_get = $this->input->get('kelembagaan');
+
+        $tahun = !empty($tahun_get) ? (int)$tahun_get : (int)date('Y');
+        $kelembagaan = !empty($kelembagaan_get) ? trim($kelembagaan_get) : 'Semua';
+
+        // Oper nilai filter ke View
+        $data['tahun_filter'] = $tahun;
+        $data['kelembagaan_filter'] = $kelembagaan;
+
+        // Query database DataSiup
+        $this->db->select('*');
+        $this->db->from('DataSiup');
+        $this->db->where('Tahun', $tahun);
+
+        if (!empty($kelembagaan) && $kelembagaan !== 'Semua') {
+            $this->db->like('Kelembagaan', $kelembagaan);
+        }
+
+        $this->db->where('DeleteAt IS NULL', null, false);
+        $this->db->order_by('id', 'DESC');
+
+        $data['siup_data'] = $this->db->get()->result();
+        $data['title'] = 'Data SIUP - Admin SINTAMIKA';
+
+        // Load halaman View
+        $this->load->view('Admin/Header', $data);
+        $this->load->view('Admin/DataSiup', $data);
+    }
+
+    public function get_siup($id) {
+        if (ob_get_level() > 0) ob_clean();
+
+        $data = $this->db->where('id', $id)->where('DeleteAt IS NULL', null, false)->get('DataSiup')->row();
+
+        if ($data) {
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'success', 'data' => $data]));
+        } else {
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'error', 'message' => 'Data tidak ditemukan']));
+        }
+    }
+
+    public function save_siup() {
+        if (ob_get_level() > 0) ob_clean();
+
+        $id = $this->input->post('id');
+        $tahun = $this->input->post('Tahun');
+
+        if (empty($tahun) || strlen((string)$tahun) !== 4 || (int)$tahun <= 2010) {
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'error', 'message' => 'Format Tahun tidak valid. Harus 4 digit angka di atas 2010.']));
+        }
+
+        $nama_perusahaan = $this->input->post('NamaPerusahaan');
+        if (empty($nama_perusahaan)) {
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'error', 'message' => 'Nama Perusahaan wajib diisi!']));
+        }
+
+        $data = array(
+            'NomorAdvis' => $this->input->post('NomorAdvis'),
+            'NamaPerusahaan' => $nama_perusahaan,
+            'NamaPenanggungjawabJabatan' => $this->input->post('NamaPenanggungjawabJabatan'),
+            'AlamatPerusahaanDireksi' => $this->input->post('AlamatPerusahaanDireksi'),
+            'KekayaanBersih' => $this->input->post('KekayaanBersih'),
+            'Kelembagaan' => $this->input->post('Kelembagaan'),
+            'KegiatanUsahaKbli' => $this->input->post('KegiatanUsahaKbli'),
+            'Direktur' => $this->input->post('Direktur'),
+            'BarangJasaUtama' => $this->input->post('BarangJasaUtama'),
+            'TanggalKeluar' => !empty($this->input->post('TanggalKeluar')) ? $this->input->post('TanggalKeluar') : null,
+            'Tahun' => $tahun
+        );
+
+        $this->db->db_debug = FALSE;
+
+        if (empty($id)) {
+            $data['InputAt'] = date('Y-m-d H:i:s');
+            $insert = $this->db->insert('DataSiup', $data);
+
+            if ($insert) {
+                return $this->output->set_content_type('application/json')
+                                    ->set_output(json_encode(['status' => 'success', 'message' => 'Data SIUP berhasil ditambahkan!']));
+            } else {
+                $db_error = $this->db->error();
+                return $this->output->set_content_type('application/json')
+                                    ->set_output(json_encode(['status' => 'error', 'message' => 'Gagal menambah data: ' . $db_error['message']]));
+            }
+        } else {
+            $data['UpdatedAt'] = date('Y-m-d H:i:s');
+            $this->db->where('id', $id);
+            $update = $this->db->update('DataSiup', $data);
+
+            if ($update) {
+                return $this->output->set_content_type('application/json')
+                                    ->set_output(json_encode(['status' => 'success', 'message' => 'Data SIUP berhasil diperbarui!']));
+            } else {
+                $db_error = $this->db->error();
+                return $this->output->set_content_type('application/json')
+                                    ->set_output(json_encode(['status' => 'error', 'message' => 'Gagal memperbarui data: ' . $db_error['message']]));
+            }
+        }
+    }
+
+    public function delete_siup($id) {
+        if (ob_get_level() > 0) ob_clean();
+
+        $this->db->where('id', $id);
+        $this->db->db_debug = FALSE;
+
+        $update = $this->db->update('DataSiup', ['DeleteAt' => date('Y-m-d H:i:s')]);
+
+        if ($update) {
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'success', 'message' => 'Data SIUP berhasil dihapus']));
+        } else {
+            $db_error = $this->db->error();
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'error', 'message' => 'Gagal menghapus data: ' . $db_error['message']]));
+        }
+    }
+
+    // ==========================================
+    // BAGIAN DATA PBG (PERSETUJUAN BANGUNAN GEDUNG)
+    // ==========================================
+
+    public function DataPbg() {
+        // Menerima input filter GET
+        $tahun_get = $this->input->get('tahun');
+        $distrik_get = $this->input->get('distrik');
+
+        $tahun = !empty($tahun_get) ? (int)$tahun_get : (int)date('Y');
+        $distrik = !empty($distrik_get) ? trim($distrik_get) : 'Semua';
+
+        $data['tahun_filter'] = $tahun;
+        $data['distrik_filter'] = $distrik;
+
+        // Query database DataPbg
+        $this->db->select('*');
+        $this->db->from('DataPbg');
+        $this->db->where('Tahun', $tahun);
+
+        if (!empty($distrik) && $distrik !== 'Semua') {
+            $this->db->like('Distrik', $distrik);
+        }
+
+        $this->db->where('DeleteAt IS NULL', null, false);
+        $this->db->order_by('id', 'DESC');
+
+        $data['pbg_data'] = $this->db->get()->result();
+        $data['title'] = 'Data PBG - Admin SINTAMIKA';
+
+        // Load Halaman View
+        $this->load->view('Admin/Header', $data);
+        $this->load->view('Admin/DataPbg', $data);
+    }
+
+    public function get_pbg($id) {
+        if (ob_get_level() > 0) ob_clean();
+
+        $data = $this->db->where('id', $id)->where('DeleteAt IS NULL', null, false)->get('DataPbg')->row();
+
+        if ($data) {
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'success', 'data' => $data]));
+        } else {
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'error', 'message' => 'Data PBG tidak ditemukan']));
+        }
+    }
+
+    public function save_pbg() {
+        if (ob_get_level() > 0) ob_clean();
+
+        $id = $this->input->post('id');
+        $tahun = $this->input->post('Tahun');
+
+        if (empty($tahun) || strlen((string)$tahun) !== 4 || (int)$tahun <= 2010) {
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'error', 'message' => 'Format Tahun tidak valid. Harus 4 digit angka di atas 2010.']));
+        }
+
+        $nama_pemilik = $this->input->post('NamaPemilikBangunan');
+        if (empty($nama_pemilik)) {
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'error', 'message' => 'Nama Pemilik Bangunan wajib diisi!']));
+        }
+
+        $data = array(
+            'NomorPermohonan' => $this->input->post('NomorPermohonan'),
+            'NomorSkPbg' => $this->input->post('NomorSkPbg'),
+            'NamaPemilikBangunan' => $nama_pemilik,
+            'AlamatPemilikBangunan' => $this->input->post('AlamatPemilikBangunan'),
+            'GunaBangunan' => $this->input->post('GunaBangunan'),
+            'NamaBangunanGedung' => $this->input->post('NamaBangunanGedung'),
+            'FungsiBangunanGedung' => $this->input->post('FungsiBangunanGedung'),
+            'SubFungsiBangunanGedung' => $this->input->post('SubFungsiBangunanGedung'),
+            'KlasifikasiKompleksitas' => $this->input->post('KlasifikasiKompleksitas'),
+            'KelasBangunan' => $this->input->post('KelasBangunan'),
+            'TotalLuas' => !empty($this->input->post('TotalLuas')) ? $this->input->post('TotalLuas') : 0.00,
+            'LuasLantai' => !empty($this->input->post('LuasLantai')) ? $this->input->post('LuasLantai') : 0.00,
+            'LuasBasemen' => !empty($this->input->post('LuasBasemen')) ? $this->input->post('LuasBasemen') : 0.00,
+            'JumlahLantaiBangunan' => !empty($this->input->post('JumlahLantaiBangunan')) ? $this->input->post('JumlahLantaiBangunan') : 0,
+            'TinggiBangunanGedung' => !empty($this->input->post('TinggiBangunanGedung')) ? $this->input->post('TinggiBangunanGedung') : 0.00,
+            'JumlahUnitBangunan' => !empty($this->input->post('JumlahUnitBangunan')) ? $this->input->post('JumlahUnitBangunan') : 0,
+            'JumlahLapisBasemen' => !empty($this->input->post('JumlahLapisBasemen')) ? $this->input->post('JumlahLapisBasemen') : 0,
+            'DiatasTanah' => $this->input->post('DiatasTanah'),
+            'LuasTanah' => !empty($this->input->post('LuasTanah')) ? $this->input->post('LuasTanah') : 0.00,
+            'PemilikTanah' => $this->input->post('PemilikTanah'),
+            'AlamatTanah' => $this->input->post('AlamatTanah'),
+            'KelurahanDesa' => $this->input->post('KelurahanDesa'),
+            'Distrik' => $this->input->post('Distrik'),
+            'Tahun' => $tahun
+        );
+
+        $this->db->db_debug = FALSE;
+
+        if (empty($id)) {
+            $data['InputAt'] = date('Y-m-d H:i:s');
+            $insert = $this->db->insert('DataPbg', $data);
+
+            if ($insert) {
+                return $this->output->set_content_type('application/json')
+                                    ->set_output(json_encode(['status' => 'success', 'message' => 'Data PBG berhasil ditambahkan!']));
+            } else {
+                $db_error = $this->db->error();
+                return $this->output->set_content_type('application/json')
+                                    ->set_output(json_encode(['status' => 'error', 'message' => 'Gagal menambah data: ' . $db_error['message']]));
+            }
+        } else {
+            $data['UpdatedAt'] = date('Y-m-d H:i:s');
+            $this->db->where('id', $id);
+            $update = $this->db->update('DataPbg', $data);
+
+            if ($update) {
+                return $this->output->set_content_type('application/json')
+                                    ->set_output(json_encode(['status' => 'success', 'message' => 'Data PBG berhasil diperbarui!']));
+            } else {
+                $db_error = $this->db->error();
+                return $this->output->set_content_type('application/json')
+                                    ->set_output(json_encode(['status' => 'error', 'message' => 'Gagal memperbarui data: ' . $db_error['message']]));
+            }
+        }
+    }
+
+    public function delete_pbg($id) {
+        if (ob_get_level() > 0) ob_clean();
+
+        $this->db->where('id', $id);
+        $this->db->db_debug = FALSE;
+
+        $update = $this->db->update('DataPbg', ['DeleteAt' => date('Y-m-d H:i:s')]);
+
+        if ($update) {
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'success', 'message' => 'Data PBG berhasil dihapus']));
+        } else {
+            $db_error = $this->db->error();
+            return $this->output->set_content_type('application/json')
+                                ->set_output(json_encode(['status' => 'error', 'message' => 'Gagal menghapus data: ' . $db_error['message']]));
+        }
+    }
 }

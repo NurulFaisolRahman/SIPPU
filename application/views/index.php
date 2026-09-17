@@ -122,7 +122,7 @@
                 
                 <!-- TOMBOL LOGIN / ADMIN DASHBOARD -->
                 <?php if($this->session->userdata('is_logged')): ?>
-                    <a href="<?= base_url('Admin/JenisIzin') ?>" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 border border-emerald-400/50 text-white rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 transition-all duration-200 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                    <a href="<?= base_url('Admin/PengaturanAkun') ?>" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 border border-emerald-400/50 text-white rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 transition-all duration-200 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
                         <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
                         <span class="text-[11px] sm:text-xs font-semibold tracking-wide">Panel Admin</span>
                     </a>
@@ -766,7 +766,7 @@
                         timer: 1500,
                         timerProgressBar: true
                     }).then(() => {
-                        window.location.href = '<?= base_url("Admin/JenisIzin") ?>';
+                        window.location.href = '<?= base_url("Admin/PengaturanAkun") ?>';
                     });
                 } else {
                     Swal.fire({
