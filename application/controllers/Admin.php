@@ -882,8 +882,16 @@ class Admin extends CI_Controller {
         }
 
         if ($update) {
+            // Update session data Kepala Dinas secara real-time setelah berhasil disimpan
+            $session_data = array(
+                'kadin_nama'    => $nama,
+                'kadin_pangkat' => $pangkat,
+                'kadin_nip'     => $nip
+            );
+            $this->session->set_userdata($session_data);
+
             return $this->output->set_content_type('application/json')
-                ->set_output(json_encode(['status' => 'success', 'message' => 'Data Kepala Dinas berhasil diperbarui!']));
+                ->set_output(json_encode(['status' => 'success', 'message' => 'Data Kepala Dinas berhasil diperbarui dan session disinkronkan!']));
         } else {
             return $this->output->set_content_type('application/json')
                 ->set_output(json_encode(['status' => 'error', 'message' => 'Gagal memperbarui data.']));

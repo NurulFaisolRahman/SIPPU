@@ -1,6 +1,3 @@
-            <!-- ExcelJS untuk Export Excel -->
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-
             <!-- SCROLLABLE CONTENT BODY -->
             <div class="w-full p-1 md:p-1 lg:p-1 pb-16">
                 <div class="bg-gradient-to-r from-teal-900 to-[#0a1324] border border-teal-800/50 rounded-xl p-6 mb-6 flex flex-col sm:flex-row items-center justify-between shadow-lg shadow-teal-900/20 relative overflow-hidden">
@@ -269,6 +266,10 @@
         const currentJenisFilter = $('#filterJenis').val();
         const currentSektorFilter = $('#filterSektor').val();
         const monthNamesIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+        const KADIN_NAMA = <?= json_encode(!empty($_SESSION['kadin_nama']) ? $_SESSION['kadin_nama'] : 'Marselino Mameyao, SKM') ?>;
+        const KADIN_PANGKAT = <?= json_encode(!empty($_SESSION['kadin_pangkat']) ? $_SESSION['kadin_pangkat'] : 'Pembina TK. I') ?>;
+        const KADIN_NIP = <?= json_encode(!empty($_SESSION['kadin_nip']) ? 'NIP : ' . $_SESSION['kadin_nip'] : 'NIP : 196805141989111002') ?>;
 
         document.addEventListener("DOMContentLoaded", function() {
             if ($.fn.DataTable) {
@@ -559,9 +560,9 @@
             
             worksheet.addRow([]); worksheet.addRow([]); worksheet.addRow([]);
 
-            addSigLine('Marselino Mameyao, SKM', true);
-            addSigLine('Pembina TK. I');
-            addSigLine('NIP : 196805141989111002');
+            addSigLine(KADIN_NAMA, true);
+            addSigLine(KADIN_PANGKAT);
+            addSigLine(KADIN_NIP);
 
             worksheet.columns = [
                 { width: 6 },  { width: 20 }, { width: 35 }, 
@@ -672,12 +673,11 @@
                 doc.text("Satu Pintu Kabupaten Mimika,", rightMargin, signY + 15);
 
                 const signatureY = signY + 38;
-                doc.setFont("helvetica", "bold");
-                doc.text("Marselino Mameyao, SKM", rightMargin, signatureY);
-
+                doc.setFont("helvetica", "bold"); 
+                doc.text(KADIN_NAMA, rightMargin, signatureY);
                 doc.setFont("helvetica", "normal");
-                doc.text("Pembina TK. I", rightMargin, signatureY + 5);
-                doc.text("NIP : 196805141989111002", rightMargin, signatureY + 10);
+                doc.text(KADIN_PANGKAT, rightMargin, signatureY + 5);
+                doc.text(KADIN_NIP, rightMargin, signatureY + 10);
 
                 doc.save(`Rekap_Profil_Usaha_Mimika_${currentTahunFilter}.pdf`);
                 Swal.close();

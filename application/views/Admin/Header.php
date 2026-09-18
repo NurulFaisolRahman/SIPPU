@@ -149,7 +149,7 @@
                 
                 <div id="sub-perizinan" class="sidebar-text pl-11 space-y-1 my-1 <?= $perizinan_active ? '' : 'hidden' ?>">
                     <a href="<?= base_url('Admin/JenisIzin') ?>" class="flex items-center gap-2 py-2 px-3 text-xs rounded-lg transition-colors <?= ($current_uri == 'JenisIzin') ? 'text-blue-400 font-bold bg-blue-500/10 border border-blue-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' ?>">
-                        <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 shrink-0"></i> Rekap Perizinan
+                        <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 shrink-0"></i> Rekap Data Perizinan
                     </a>
                     <a href="<?= base_url('Admin/DataSiujk') ?>" class="flex items-center gap-2 py-2 px-3 text-xs rounded-lg transition-colors <?= ($current_uri == 'DataSiujk') ? 'text-blue-400 font-bold bg-blue-500/10 border border-blue-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' ?>">
                         <i data-lucide="hard-hat" class="w-3.5 h-3.5 shrink-0"></i> Data SIUJK

@@ -331,6 +331,10 @@
             const monthNamesIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const monthShortIndo = ["JAN", "FEB", "MAR", "APR", "MEI", "JUN", "JUL", "AGS", "SEP", "OKT", "NOV", "DES"];
 
+            const KADIN_NAMA = <?= json_encode(!empty($_SESSION['kadin_nama']) ? $_SESSION['kadin_nama'] : 'Marselino Mameyao, SKM') ?>;
+            const KADIN_PANGKAT = <?= json_encode(!empty($_SESSION['kadin_pangkat']) ? $_SESSION['kadin_pangkat'] : 'Pembina TK. I') ?>;
+            const KADIN_NIP = <?= json_encode(!empty($_SESSION['kadin_nip']) ? 'NIP : ' . $_SESSION['kadin_nip'] : 'NIP : 196805141989111002') ?>;
+
             let opdIndex = 0;
             let pIndex = 0;
             let currentOpdIdForPelayanan = null;
@@ -511,9 +515,9 @@
                 addSig('Penanaman Modal dan Pelayanan Terpadu');
                 addSig('Satu Pintu Kabupaten Mimika,');
                 worksheet.addRow([]); worksheet.addRow([]); worksheet.addRow([]);
-                addSig('Marselino Mameyao, SKM', true);
-                addSig('Pembina TK. I');
-                addSig('NIP : 196805141989111002');
+                addSig(KADIN_NAMA, true);
+                addSig(KADIN_PANGKAT);
+                addSig(KADIN_NIP);
 
                 let colWidths = [{ width: 6 }, { width: 35 }, { width: 30 }];
                 for (let m = startMonth; m <= endMonth; m++) colWidths.push({ width: 10 });
@@ -661,11 +665,11 @@
                     doc.text("Satu Pintu Kabupaten Mimika,", rightMargin, signY + 15);
 
                     const signatureY = signY + 35;
-                    doc.setFont("helvetica", "bold");
-                    doc.text("Marselino Mameyao, SKM", rightMargin, signatureY);
+                    doc.setFont("helvetica", "bold"); 
+                    doc.text(KADIN_NAMA, rightMargin, signatureY);
                     doc.setFont("helvetica", "normal");
-                    doc.text("Pembina TK. I", rightMargin, signatureY + 5);
-                    doc.text("NIP : 196805141989111002", rightMargin, signatureY + 10);
+                    doc.text(KADIN_PANGKAT, rightMargin, signatureY + 5);
+                    doc.text(KADIN_NIP, rightMargin, signatureY + 10);
 
                     doc.save(`Rekap_MPP_Mimika_${selectedTahun}_${selectedPeriode}_Bulan_${startMonth}_d_${endMonth}.pdf`);
                     Swal.close();

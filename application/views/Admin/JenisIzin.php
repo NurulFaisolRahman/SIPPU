@@ -244,6 +244,10 @@
         const monthNamesIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
         const monthShortIndo = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'];
 
+        const KADIN_NAMA = <?= json_encode(!empty($_SESSION['kadin_nama']) ? $_SESSION['kadin_nama'] : 'Marselino Mameyao, SKM') ?>;
+        const KADIN_PANGKAT = <?= json_encode(!empty($_SESSION['kadin_pangkat']) ? $_SESSION['kadin_pangkat'] : 'Pembina TK. I') ?>;
+        const KADIN_NIP = <?= json_encode(!empty($_SESSION['kadin_nip']) ? 'NIP : ' . $_SESSION['kadin_nip'] : 'NIP : 196805141989111002') ?>;
+
         let izinIndex = 0;
 
         function refreshIcons() {
@@ -675,9 +679,9 @@
             worksheet.addRow([]);
             worksheet.addRow([]);
 
-            addSigLine('Marselino Mameyao, SKM', true);
-            addSigLine('Pembina TK. I');
-            addSigLine('NIP : 196805141989111002');
+            addSigLine(KADIN_NAMA, true);
+            addSigLine(KADIN_PANGKAT);
+            addSigLine(KADIN_NIP);
 
 
             worksheet.columns = [
@@ -821,13 +825,12 @@
                 doc.text("Satu Pintu Kabupaten Mimika,", rightMargin, finalY + 15);
 
                 const signatureY = finalY + 38;
-                doc.setFont("helvetica", "bold");
-                doc.text("Marselino Mameyao, SKM", rightMargin, signatureY);
-                const textWidthNama = doc.getTextWidth("Marselino Mameyao, SKM");
-
+                doc.setFont("helvetica", "bold"); 
+                doc.text(KADIN_NAMA, rightMargin, signatureY);
+                const textWidthNama = doc.getTextWidth(KADIN_NAMA);
                 doc.setFont("helvetica", "normal");
-                doc.text("Pembina TK. I", rightMargin, signatureY + 5);
-                doc.text("NIP : 196805141989111002", rightMargin, signatureY + 10);
+                doc.text(KADIN_PANGKAT, rightMargin, signatureY + 5);
+                doc.text(KADIN_NIP, rightMargin, signatureY + 10);
 
                 doc.save(`Rekap_Data_Perizinan_Mimika_${currentYearPDF}.pdf`);
                 Swal.close();

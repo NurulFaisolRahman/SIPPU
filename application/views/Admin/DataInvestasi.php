@@ -202,6 +202,10 @@
             const currentTahunFilter = $('#filterTahun').val() || '<?= date("Y") ?>';
             const monthNamesIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
+            const KADIN_NAMA = <?= json_encode(!empty($_SESSION['kadin_nama']) ? $_SESSION['kadin_nama'] : 'Marselino Mameyao, SKM') ?>;
+            const KADIN_PANGKAT = <?= json_encode(!empty($_SESSION['kadin_pangkat']) ? $_SESSION['kadin_pangkat'] : 'Pembina TK. I') ?>;
+            const KADIN_NIP = <?= json_encode(!empty($_SESSION['kadin_nip']) ? 'NIP : ' . $_SESSION['kadin_nip'] : 'NIP : 196805141989111002') ?>;
+            
             document.addEventListener("DOMContentLoaded", function() {
                 if ($.fn.DataTable) {
                     $('#tabelInvestasi').DataTable({
@@ -492,9 +496,9 @@
                 
                 worksheet.addRow([]); worksheet.addRow([]); worksheet.addRow([]);
 
-                addSigLine('Marselino Mameyao, SKM', true);
-                addSigLine('Pembina TK. I');
-                addSigLine('NIP : 196805141989111002');
+                addSigLine(KADIN_NAMA, true);
+                addSigLine(KADIN_PANGKAT);
+                addSigLine(KADIN_NIP);
 
                 // Lebar Kolom Excel
                 worksheet.columns = [
@@ -657,12 +661,11 @@
                     doc.text("Satu Pintu Kabupaten Mimika,", rightMargin, signY + 15);
 
                     const signatureY = signY + 38;
-                    doc.setFont("helvetica", "bold");
-                    doc.text("Marselino Mameyao, SKM", rightMargin, signatureY);
-
+                    doc.setFont("helvetica", "bold"); 
+                    doc.text(KADIN_NAMA, rightMargin, signatureY);
                     doc.setFont("helvetica", "normal");
-                    doc.text("Pembina TK. I", rightMargin, signatureY + 5);
-                    doc.text("NIP : 196805141989111002", rightMargin, signatureY + 10);
+                    doc.text(KADIN_PANGKAT, rightMargin, signatureY + 5);
+                    doc.text(KADIN_NIP, rightMargin, signatureY + 10);
 
                     doc.save(`Rekap_Data_Investasi_Mimika_TAHUN_${currentTahunFilter}.pdf`);
                     Swal.close();

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 12 Sep 2026 pada 03.58
+-- Waktu pembuatan: 18 Sep 2026 pada 03.41
 -- Versi server: 10.4.27-MariaDB
 -- Versi PHP: 7.4.33
 
@@ -40,7 +40,7 @@ CREATE TABLE `akunadmin` (
 --
 
 INSERT INTO `akunadmin` (`Username`, `Password`, `InputAt`, `UpdateAt`, `DeleteAt`) VALUES
-('admin', '$2y$10$31BUT8ggyd.Brh8jhOXXC.lA8v.nUpX5/0117bTG3t1DRE.q5o.Be', '2026-07-11 13:53:09', '2026-07-11 15:43:11', NULL);
+('sintamika', '$2y$10$/EVdXWxELo0kAkwm3HjLrOUH.ZyZx3Yc7icaH0xAKytXISYMY7X/6', '2026-07-11 13:53:09', '2026-09-17 09:21:01', NULL);
 
 -- --------------------------------------------------------
 
@@ -69,6 +69,112 @@ INSERT INTO `datainvestasi` (`id`, `id_profil`, `Tahun`, `NilaiInvestasiPMDN`, `
 (4, 8, 2026, 15000000, 90000000, 7, 15, '2026-08-25 07:05:34', '2026-09-12 01:37:59', NULL),
 (5, 7, 2026, 60000000, 70000000, 15, 7, '2026-09-08 03:44:21', '2026-09-12 01:38:12', NULL),
 (6, 9, 2026, 96000000, 15000000, 9, 7, '2026-09-11 20:54:51', '2026-09-11 20:54:51', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `datapbg`
+--
+
+CREATE TABLE `datapbg` (
+  `id` int(11) NOT NULL,
+  `NomorPermohonan` varchar(100) DEFAULT NULL,
+  `NomorSkPbg` varchar(100) DEFAULT NULL,
+  `NamaPemilikBangunan` varchar(200) NOT NULL,
+  `AlamatPemilikBangunan` text DEFAULT NULL,
+  `GunaBangunan` varchar(150) DEFAULT NULL,
+  `NamaBangunanGedung` varchar(255) DEFAULT NULL,
+  `FungsiBangunanGedung` varchar(150) DEFAULT NULL,
+  `SubFungsiBangunanGedung` varchar(150) DEFAULT NULL,
+  `KlasifikasiKompleksitas` varchar(100) DEFAULT NULL,
+  `KelasBangunan` varchar(100) DEFAULT NULL,
+  `TotalLuas` decimal(12,2) DEFAULT 0.00,
+  `LuasLantai` decimal(12,2) DEFAULT 0.00,
+  `LuasBasemen` decimal(12,2) DEFAULT 0.00,
+  `JumlahLantaiBangunan` int(11) DEFAULT 0,
+  `TinggiBangunanGedung` decimal(8,2) DEFAULT 0.00,
+  `JumlahUnitBangunan` int(11) DEFAULT 0,
+  `JumlahLapisBasemen` int(11) DEFAULT 0,
+  `DiatasTanah` varchar(150) DEFAULT NULL,
+  `LuasTanah` decimal(12,2) DEFAULT 0.00,
+  `PemilikTanah` varchar(200) DEFAULT NULL,
+  `AlamatTanah` text DEFAULT NULL,
+  `KelurahanDesa` varchar(150) DEFAULT NULL,
+  `Distrik` varchar(150) DEFAULT NULL,
+  `Tahun` int(4) NOT NULL,
+  `InputAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `UpdatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `DeleteAt` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `datapbg`
+--
+
+INSERT INTO `datapbg` (`id`, `NomorPermohonan`, `NomorSkPbg`, `NamaPemilikBangunan`, `AlamatPemilikBangunan`, `GunaBangunan`, `NamaBangunanGedung`, `FungsiBangunanGedung`, `SubFungsiBangunanGedung`, `KlasifikasiKompleksitas`, `KelasBangunan`, `TotalLuas`, `LuasLantai`, `LuasBasemen`, `JumlahLantaiBangunan`, `TinggiBangunanGedung`, `JumlahUnitBangunan`, `JumlahLapisBasemen`, `DiatasTanah`, `LuasTanah`, `PemilikTanah`, `AlamatTanah`, `KelurahanDesa`, `Distrik`, `Tahun`, `InputAt`, `UpdatedAt`, `DeleteAt`) VALUES
+(1, '940416-13122025-003', 'SK-PBG-940416-13022026-001', 'FATHUR BERSAUDARA', 'Jl. Henggi Desa/Kelurahan Kamoro Jaya Kecamatan Wania Kabupaten Mimika Provinsi Papua Tengah', 'Mendirikan Bangunan Gedung Baru', 'Ruko 1 Unit 2 Lantai', 'Fungsi Usaha (UMKM)', 'Bangunan Gedung Perdagangan', 'Bangunan Tidak Sederhana', '6', '515.00', '515.00', '0.00', 2, '8.00', 1, 0, 'Sertifikat', '1778.00', 'FATHUR ROZI', 'FATHUR ROZI', 'Wonosari Jaya', 'Wania', 2026, '2026-09-17 10:21:37', '2026-09-17 15:21:37', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `datasiujk`
+--
+
+CREATE TABLE `datasiujk` (
+  `id` int(11) NOT NULL,
+  `NomorAdvis` varchar(100) DEFAULT NULL,
+  `NamaPerusahaan` varchar(255) NOT NULL,
+  `Jalan` text DEFAULT NULL,
+  `KelDistrik` varchar(150) DEFAULT NULL,
+  `RtRw` varchar(50) DEFAULT NULL,
+  `NamaPenanggungjawab` varchar(150) DEFAULT NULL,
+  `NpwpPerusahaan` varchar(50) DEFAULT NULL,
+  `MasaBerlaku` date DEFAULT NULL,
+  `TanggalCetak` date DEFAULT NULL,
+  `Keterangan` enum('Baru','Perpanjang') DEFAULT 'Baru',
+  `Tahun` int(4) NOT NULL,
+  `InputAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `UpdatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `DeleteAt` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `datasiujk`
+--
+
+INSERT INTO `datasiujk` (`id`, `NomorAdvis`, `NamaPerusahaan`, `Jalan`, `KelDistrik`, `RtRw`, `NamaPenanggungjawab`, `NpwpPerusahaan`, `MasaBerlaku`, `TanggalCetak`, `Keterangan`, `Tahun`, `InputAt`, `UpdatedAt`, `DeleteAt`) VALUES
+(1, '001/SIUJK/DPMPTSP/2026', 'CV. KAMAROKO BUMA BERKAH', 'CENDERAWASIH - TIMIKA', 'KWAMKI BARU DISTRIK IMIKA BARU', '000/000', 'AGUSTINA KAMAROKO', '61.652.241.3-953.000', '2028-11-18', '2026-01-07', 'Perpanjang', 2026, '2026-09-17 08:22:26', '2026-09-17 08:23:59', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `datasiup`
+--
+
+CREATE TABLE `datasiup` (
+  `id` int(11) NOT NULL,
+  `NomorAdvis` varchar(100) DEFAULT NULL,
+  `NamaPerusahaan` varchar(255) NOT NULL,
+  `NamaPenanggungjawabJabatan` varchar(255) DEFAULT NULL,
+  `AlamatPerusahaanDireksi` text DEFAULT NULL,
+  `KekayaanBersih` varchar(100) DEFAULT NULL,
+  `Kelembagaan` varchar(100) DEFAULT NULL,
+  `KegiatanUsahaKbli` text DEFAULT NULL,
+  `Direktur` varchar(150) DEFAULT NULL,
+  `BarangJasaUtama` text DEFAULT NULL,
+  `TanggalKeluar` date DEFAULT NULL,
+  `Tahun` int(4) NOT NULL,
+  `InputAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `UpdatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `DeleteAt` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `datasiup`
+--
+
+INSERT INTO `datasiup` (`id`, `NomorAdvis`, `NamaPerusahaan`, `NamaPenanggungjawabJabatan`, `AlamatPerusahaanDireksi`, `KekayaanBersih`, `Kelembagaan`, `KegiatanUsahaKbli`, `Direktur`, `BarangJasaUtama`, `TanggalKeluar`, `Tahun`, `InputAt`, `UpdatedAt`, `DeleteAt`) VALUES
+(1, '510/001-DPMPTSP/PK/2024', 'CV. DWANTA', 'JARWANTO', 'JL. KARTINI NO. 126 KEL. INAUGA TIMIKA', '300000000', 'PEMASOK', 'KONSTRUKSI GEDUNG HUNIAN (41011)', 'DIREKTUR', 'PERDAGANGAN BARANG & JASA', '2026-01-08', 2026, '2026-09-17 09:12:03', '2026-09-18 00:32:58', NULL);
 
 -- --------------------------------------------------------
 
@@ -8381,6 +8487,29 @@ INSERT INTO `jenisizin` (`id`, `JenisIzin`, `InputAt`, `UpdatedAt`, `DeleteAt`) 
 -- --------------------------------------------------------
 
 --
+-- Struktur dari tabel `kepaladinas`
+--
+
+CREATE TABLE `kepaladinas` (
+  `id` int(11) NOT NULL,
+  `Nama` varchar(150) NOT NULL,
+  `Pangkat` varchar(100) DEFAULT NULL,
+  `NIP` varchar(50) DEFAULT NULL,
+  `InputAt` datetime DEFAULT NULL,
+  `UpdatedAt` datetime DEFAULT NULL,
+  `DeleteAt` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `kepaladinas`
+--
+
+INSERT INTO `kepaladinas` (`id`, `Nama`, `Pangkat`, `NIP`, `InputAt`, `UpdatedAt`, `DeleteAt`) VALUES
+(1, 'Marselino Mameyao, AKM, SKM', 'Pembina TK. I', '196805141989111002', '2026-09-17 15:40:00', '2026-09-18 03:41:03', NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Struktur dari tabel `opd`
 --
 
@@ -8746,6 +8875,7 @@ CREATE TABLE `profilusaha` (
   `id` int(11) NOT NULL,
   `NamaUsaha` varchar(255) NOT NULL,
   `NIB` varchar(50) NOT NULL,
+  `JenisUsaha` varchar(10) DEFAULT NULL,
   `NamaPemilik` varchar(150) NOT NULL,
   `SektorUsaha` varchar(100) NOT NULL,
   `Alamat` text NOT NULL,
@@ -8763,10 +8893,10 @@ CREATE TABLE `profilusaha` (
 -- Dumping data untuk tabel `profilusaha`
 --
 
-INSERT INTO `profilusaha` (`id`, `NamaUsaha`, `NIB`, `NamaPemilik`, `SektorUsaha`, `Alamat`, `Tahun`, `id_provinsi`, `id_kabupaten`, `id_distrik`, `id_kampung`, `InputAt`, `UpdateAt`, `DeleteAt`) VALUES
-(7, 'PT Izanamy', '1092837465996', 'Jygen', 'Industri Pengolahan', 'Jalan Raya Agimuga No. 7', 2026, '94', '94.04', '94.04.02', '94.04.02.2001', '2026-09-08 07:19:10', '2026-09-12 01:08:42', NULL),
-(8, 'PT Izanagy', '1092837465915', 'Jyren', 'Konstruksi', 'Jalan Raya Mimika Tengah No 15 Tiwaka', 2026, '94', '94.04', '94.04.08', '94.04.08.2002', '2026-09-08 08:03:48', '2026-09-12 01:12:04', NULL),
-(9, 'PT Akatsuki', '1092837465907', 'Hydan', 'Jasa Kesehatan', 'Jalan Raya Agimuga No 7 Amungun', 2026, '94', '94.04', '94.04.02', '94.04.02.2002', '2026-09-12 01:14:21', '2026-09-12 01:15:21', NULL);
+INSERT INTO `profilusaha` (`id`, `NamaUsaha`, `NIB`, `JenisUsaha`, `NamaPemilik`, `SektorUsaha`, `Alamat`, `Tahun`, `id_provinsi`, `id_kabupaten`, `id_distrik`, `id_kampung`, `InputAt`, `UpdateAt`, `DeleteAt`) VALUES
+(7, 'Izanamy', '1092837465996', 'PT', 'Jygen', 'Industri Pengolahan', 'Jalan Raya Agimuga No. 7', 2026, '94', '94.04', '94.04.02', '94.04.02.2001', '2026-09-08 07:19:10', '2026-09-13 10:31:43', NULL),
+(8, 'Izanagy', '1092837465915', 'PT', 'Jyren', 'Konstruksi', 'Jalan Raya Mimika Tengah No 15 Tiwaka', 2026, '94', '94.04', '94.04.08', '94.04.08.2002', '2026-09-08 08:03:48', '2026-09-13 10:31:01', NULL),
+(9, 'Akatsuki', '1092837465907', 'CV', 'Hydan', 'Jasa Kesehatan', 'Jalan Raya Jita No 7 Wapu', 2026, '94', '94.04', '94.04.05', '94.04.05.2004', '2026-09-12 01:14:21', '2026-09-13 10:35:10', NULL);
 
 -- --------------------------------------------------------
 
@@ -12533,6 +12663,24 @@ ALTER TABLE `datainvestasi`
   ADD KEY `fk_datainvestasi_profilusaha` (`id_profil`);
 
 --
+-- Indeks untuk tabel `datapbg`
+--
+ALTER TABLE `datapbg`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `datasiujk`
+--
+ALTER TABLE `datasiujk`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `datasiup`
+--
+ALTER TABLE `datasiup`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indeks untuk tabel `distrik`
 --
 ALTER TABLE `distrik`
@@ -12542,6 +12690,12 @@ ALTER TABLE `distrik`
 -- Indeks untuk tabel `jenisizin`
 --
 ALTER TABLE `jenisizin`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `kepaladinas`
+--
+ALTER TABLE `kepaladinas`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -12589,10 +12743,34 @@ ALTER TABLE `datainvestasi`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
+-- AUTO_INCREMENT untuk tabel `datapbg`
+--
+ALTER TABLE `datapbg`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT untuk tabel `datasiujk`
+--
+ALTER TABLE `datasiujk`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT untuk tabel `datasiup`
+--
+ALTER TABLE `datasiup`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT untuk tabel `jenisizin`
 --
 ALTER TABLE `jenisizin`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
+
+--
+-- AUTO_INCREMENT untuk tabel `kepaladinas`
+--
+ALTER TABLE `kepaladinas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT untuk tabel `opd`

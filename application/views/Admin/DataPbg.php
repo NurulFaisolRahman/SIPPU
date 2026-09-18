@@ -26,14 +26,7 @@
                 <form method="GET" action="<?= base_url('Admin/DataPbg') ?>" class="flex items-center gap-3 w-full sm:w-auto">
                     <div class="flex items-center gap-2">
                         <label class="text-[10px] font-semibold text-slate-300">Tahun:</label>
-                        <select name="tahun" class="bg-[#0f172a] border border-slate-700 text-slate-200 text-xs rounded-md px-2 py-1 focus:outline-none focus:border-teal-500">
-                            <?php 
-                            $current_yr = (int)date('Y');
-                            for($i = $current_yr; $i >= 2018; $i--): 
-                            ?>
-                                <option value="<?= $i ?>" <?= (isset($tahun_filter) && $tahun_filter == $i) ? 'selected' : '' ?>><?= $i ?></option>
-                            <?php endfor; ?>
-                        </select>
+                        <input type="number" name="tahun" id="filterTahun" value="<?= isset($tahun_filter) ? $tahun_filter : date('Y') ?>" min="2000" max="2099" class="bg-[#0f172a] border border-slate-700 text-slate-200 text-xs rounded-md px-2 py-1 focus:outline-none focus:border-teal-500 w-20 sm:w-24">
                     </div>
 
                     <button type="submit" class="bg-[#1e2d4a] hover:bg-[#2e4063] text-white p-1 px-3 rounded-md transition-colors flex items-center gap-1 text-[10px] font-semibold border border-slate-600">
@@ -41,8 +34,15 @@
                     </button>
                 </form>
 
-                <!-- BUTTONS ACTION -->
+                <!-- BUTTONS ACTION (Added Excel & PDF) -->
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <button type="button" onclick="downloadExcel()" class="flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-md px-3 py-1.5 text-[10px] transition-all shadow-[0_0_12px_rgba(16,185,129,0.3)]">
+                        <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Excel
+                    </button>
+                    <button type="button" onclick="downloadPDF()" class="flex items-center justify-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white font-semibold rounded-md px-3 py-1.5 text-[10px] transition-all shadow-[0_0_12px_rgba(225,29,72,0.3)]">
+                        <i data-lucide="file-text" class="w-3.5 h-3.5"></i> PDF
+                    </button>
+                    <div class="w-px h-5 bg-slate-700 mx-1"></div>
                     <button onclick="openModal()" class="flex items-center justify-center gap-1 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-md px-3 py-1.5 text-[10px] transition-all shadow-[0_0_15px_rgba(13,148,136,0.3)]">
                         <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah PBG
                     </button>
@@ -51,10 +51,8 @@
         </div>
 
         <!-- TABEL DATA -->
-        <!-- overflow-x-hidden ditambahkan & layout disesuaikan agar tidak scroll horizontal -->
         <div class="bg-[#1e2d4a]/40 border border-slate-700/50 rounded-xl overflow-hidden shadow-lg p-3">
             <div class="w-full">
-                <!-- DataTables akan menggunakan class ini -->
                 <table id="tablePbg" class="w-full text-left border-collapse text-xs break-words">
                     <thead>
                         <tr class="bg-[#0f172a] text-slate-300 border-b border-slate-700 uppercase tracking-wider text-[10px]">
@@ -122,10 +120,6 @@
                                 </td>
                             </tr>
                             <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="7" class="p-4 text-center text-slate-400 text-xs">Tidak ada data PBG yang ditemukan.</td>
-                            </tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -139,7 +133,6 @@
 <div id="modalPbg" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 overflow-y-auto">
     <div class="bg-[#1e2d4a] border border-slate-700/80 rounded-xl w-full max-w-4xl shadow-2xl my-8 overflow-hidden transform transition-all">
         
-        <!-- MODAL HEADER -->
         <div class="flex items-center justify-between p-4 border-b border-slate-700/70 bg-[#0f172a]/50">
             <h3 id="modalTitle" class="text-sm font-bold text-white flex items-center gap-2">
                 <i data-lucide="file-plus" class="w-4 h-4 text-teal-400"></i>
@@ -150,11 +143,10 @@
             </button>
         </div>
 
-        <!-- MODAL FORM -->
         <form id="formPbg" onsubmit="submitForm(event)" class="p-4 sm:p-6 space-y-5 max-h-[75vh] overflow-y-auto">
             <input type="hidden" id="pbg_id" name="id">
 
-            <!-- BAGIAN 1: DOKUMEN & PEMILIK -->
+            <!-- BAGIAN 1 -->
             <div class="space-y-2">
                 <h4 class="text-[10px] font-bold text-teal-400 uppercase tracking-wider border-b border-slate-700/60 pb-1 flex items-center gap-1.5">
                     <i data-lucide="user" class="w-3 h-3"></i> Data Dokumen & Pemilik Bangunan
@@ -170,7 +162,7 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-semibold text-slate-300 mb-1">Tahun Dokumen <span class="text-rose-400">*</span></label>
-                        <input type="number" id="Tahun" name="Tahun" value="<?= date('Y') ?>" min="2010" max="2099" required class="w-full bg-[#0f172a] border border-slate-700 rounded-md px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                        <input type="number" id="Tahun" name="Tahun" value="<?= isset($tahun_filter) ? $tahun_filter : date('Y') ?>" min="2010" max="2099" required class="w-full bg-[#0f172a] border border-slate-700 rounded-md px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-teal-500">
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-semibold text-slate-300 mb-1">Nama Pemilik Bangunan <span class="text-rose-400">*</span></label>
@@ -183,7 +175,7 @@
                 </div>
             </div>
 
-            <!-- BAGIAN 2: DETAIL BANGUNAN GEDUNG -->
+            <!-- BAGIAN 2 -->
             <div class="space-y-2">
                 <h4 class="text-[10px] font-bold text-teal-400 uppercase tracking-wider border-b border-slate-700/60 pb-1 flex items-center gap-1.5">
                     <i data-lucide="building" class="w-3 h-3"></i> Detail Bangunan Gedung
@@ -216,7 +208,7 @@
                 </div>
             </div>
 
-            <!-- BAGIAN 3: SPESIFIKASI LUAS & UKURAN -->
+            <!-- BAGIAN 3 -->
             <div class="space-y-2">
                 <h4 class="text-[10px] font-bold text-teal-400 uppercase tracking-wider border-b border-slate-700/60 pb-1 flex items-center gap-1.5">
                     <i data-lucide="ruler" class="w-3 h-3"></i> Spesifikasi Ukuran & Fisik Bangunan
@@ -253,7 +245,7 @@
                 </div>
             </div>
 
-            <!-- BAGIAN 4: DATA TANAH & LOKASI -->
+            <!-- BAGIAN 4 -->
             <div class="space-y-2">
                 <h4 class="text-[10px] font-bold text-teal-400 uppercase tracking-wider border-b border-slate-700/60 pb-1 flex items-center gap-1.5">
                     <i data-lucide="map" class="w-3 h-3"></i> Data Tanah & Lokasi
@@ -307,7 +299,13 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 
-<!-- Gaya Khusus DataTables agar menyatu dengan Tailwind -->
+<!-- jsPDF & AutoTable for PDF Export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+<!-- ExcelJS for Excel Export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+
+<!-- Gaya Khusus DataTables -->
 <style>
     .dataTables_wrapper .dataTables_length select {
         background-color: #0f172a; border: 1px solid #334155; color: #e2e8f0; border-radius: 0.375rem; padding: 0.1rem 0.5rem; font-size: 0.75rem;
@@ -330,13 +328,20 @@
 </style>
 
 <script>
+    const currentTahunFilter = $('#filterTahun').val();
+    const dataPbgExport = <?= json_encode(!empty($pbg_data) ? $pbg_data : []) ?>;
+    const monthNamesIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    const KADIN_NAMA = <?= json_encode(!empty($_SESSION['kadin_nama']) ? $_SESSION['kadin_nama'] : 'Marselino Mameyao, SKM') ?>;
+    const KADIN_PANGKAT = <?= json_encode(!empty($_SESSION['kadin_pangkat']) ? $_SESSION['kadin_pangkat'] : 'Pembina TK. I') ?>;
+    const KADIN_NIP = <?= json_encode(!empty($_SESSION['kadin_nip']) ? 'NIP : ' . $_SESSION['kadin_nip'] : 'NIP : 196805141989111002') ?>;
+
     $(document).ready(function() {
         lucide.createIcons();
 
-        // Initialize DataTable with specific lengthMenu 10, 25, 50, Semua
         if ($.fn.DataTable) {
             $('#tablePbg').DataTable({
-                responsive: false, // Dimatikan agar tidak menggunakan mode plus (+) melainkan wrap responsif
+                responsive: false,
                 autoWidth: false,
                 lengthMenu: [
                     [10, 25, 50, -1],
@@ -355,9 +360,281 @@
         }
     });
 
+    async function downloadExcel() {
+        if (typeof window.ExcelJS === 'undefined') {
+            Swal.fire('Error', 'Library ExcelJS belum termuat.', 'error'); return;
+        }
+
+        const workbook = new window.ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Data PBG');
+        const lastColLetter = 'X'; // 24 Columns (A-X) after removing Tahun
+
+        // Headers
+        worksheet.addRow(['PEMERINTAH KABUPATEN MIMIKA']);
+        worksheet.mergeCells(`A1:${lastColLetter}1`);
+        worksheet.getCell('A1').font = { name: 'Arial', size: 14, bold: true };
+        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+
+        worksheet.addRow(['DINAS PENANAMAN MODAL DAN PELAYANAN TERPADU SATU PINTU']);
+        worksheet.mergeCells(`A2:${lastColLetter}2`);
+        worksheet.getCell('A2').font = { name: 'Arial', size: 14, bold: true };
+        worksheet.getCell('A2').alignment = { vertical: 'middle', horizontal: 'center' };
+
+        worksheet.addRow(['Jl. Poros Kuala Kencana Pusat Pemerintahan Gedung D Lantai II']);
+        worksheet.mergeCells(`A3:${lastColLetter}3`);
+        worksheet.getCell('A3').font = { name: 'Arial', size: 11 };
+        worksheet.getCell('A3').alignment = { vertical: 'middle', horizontal: 'center' };
+
+        worksheet.addRow(['Tlp. (0901) 3262943 Timika - Papua Pos 99910']);
+        worksheet.mergeCells(`A4:${lastColLetter}4`);
+        worksheet.getCell('A4').font = { name: 'Arial', size: 11 };
+        worksheet.getCell('A4').alignment = { vertical: 'middle', horizontal: 'center' };
+        
+        for(let i = 1; i <= 24; i++) worksheet.getCell(5, i).border = { bottom: { style: 'double' } };
+        worksheet.addRow([]); 
+
+        worksheet.addRow([`REKAPITULASI DATA PERSETUJUAN BANGUNAN GEDUNG (PBG)`]);
+        worksheet.mergeCells(`A7:${lastColLetter}7`);
+        worksheet.getCell('A7').font = { name: 'Arial', size: 12, bold: true };
+        worksheet.getCell('A7').alignment = { vertical: 'middle', horizontal: 'center' };
+
+        worksheet.addRow([`TAHUN ${currentTahunFilter}`]);
+        worksheet.mergeCells(`A8:${lastColLetter}8`);
+        worksheet.getCell('A8').font = { name: 'Arial', size: 11, bold: true };
+        worksheet.getCell('A8').alignment = { vertical: 'middle', horizontal: 'center' };
+
+        worksheet.addRow([]); 
+
+        // Kolom TAHUN dihapus dari headers
+        let headers = [
+            'NO', 'NO. PERMOHONAN', 'NO. SK PBG', 'NAMA PEMILIK BANGUNAN', 'ALAMAT PEMILIK',
+            'NAMA BANGUNAN', 'GUNA BANGUNAN', 'FUNGSI BANGUNAN', 'SUB FUNGSI',
+            'KLASIFIKASI', 'KELAS', 'TOTAL LUAS', 'LUAS LANTAI', 'LUAS BASEMEN',
+            'JML LANTAI', 'TINGGI (m)', 'JML UNIT', 'JML LAPIS BASEMEN',
+            'STATUS TANAH', 'LUAS TANAH', 'PEMILIK TANAH', 'KELURAHAN/DESA', 'DISTRIK', 'ALAMAT TANAH'
+        ];
+        const headerRow = worksheet.addRow(headers);
+        
+        headerRow.eachCell((cell) => {
+            cell.font = { name: 'Arial', size: 10, bold: true };
+            cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF92CDDC' } };
+            cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        });
+
+        if (dataPbgExport.length > 0) {
+            dataPbgExport.forEach((item, index) => {
+                // Kolom item.Tahun dihapus dari rowData
+                const rowData = [
+                    (index + 1),
+                    (item.NomorPermohonan || '-'),
+                    (item.NomorSkPbg || '-'),
+                    (item.NamaPemilikBangunan || '-'),
+                    (item.AlamatPemilikBangunan || '-'),
+                    (item.NamaBangunanGedung || '-'),
+                    (item.GunaBangunan || '-'),
+                    (item.FungsiBangunanGedung || '-'),
+                    (item.SubFungsiBangunanGedung || '-'),
+                    (item.KlasifikasiKompleksitas || '-'),
+                    (item.KelasBangunan || '-'),
+                    (item.TotalLuas || '-'),
+                    (item.LuasLantai || '-'),
+                    (item.LuasBasemen || '-'),
+                    (item.JumlahLantaiBangunan || '-'),
+                    (item.TinggiBangunanGedung || '-'),
+                    (item.JumlahUnitBangunan || '-'),
+                    (item.JumlahLapisBasemen || '-'),
+                    (item.DiatasTanah || '-'),
+                    (item.LuasTanah || '-'),
+                    (item.PemilikTanah || '-'),
+                    (item.KelurahanDesa || '-'),
+                    (item.Distrik || '-'),
+                    (item.AlamatTanah || '-')
+                ];
+                const dataRow = worksheet.addRow(rowData);
+                
+                dataRow.eachCell((cell, colNumber) => {
+                    cell.font = { name: 'Arial', size: 10 };
+                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                    cell.alignment = { vertical: 'middle', horizontal: (colNumber === 1) ? 'center' : 'left', wrapText: true };
+                });
+            });
+        } else {
+            let emptyArr = ['Belum ada data'];
+            for(let i=1; i<24; i++) emptyArr.push('');
+            const emptyRow = worksheet.addRow(emptyArr);
+            worksheet.mergeCells(`A${emptyRow.number}:${lastColLetter}${emptyRow.number}`);
+            emptyRow.getCell(1).alignment = { horizontal: 'center' };
+        }
+
+        worksheet.addRow([]); worksheet.addRow([]);
+        
+        const now = new Date();
+        const dateStr = `${now.getDate()} ${monthNamesIndo[now.getMonth()]} ${now.getFullYear()}`;
+        const addSigLine = (text, bold = false) => {
+            const row = worksheet.addRow([]);
+            const cell = row.getCell(21); // Posisi ttd digeser ke kolom 21 (U) karena kolom berkurang
+            cell.value = text;
+            cell.font = { name: 'Arial', size: 11, bold: bold };
+            cell.alignment = { horizontal: 'left' };
+        };
+
+        addSigLine(`TIMIKA, ${dateStr}`);
+        addSigLine('Kepala Dinas,');
+        addSigLine('Penanaman Modal dan Pelayanan Terpadu');
+        addSigLine('Satu Pintu Kabupaten Mimika,');
+        
+        worksheet.addRow([]); worksheet.addRow([]); worksheet.addRow([]);
+
+        addSigLine(KADIN_NAMA, true);
+        addSigLine(KADIN_PANGKAT);
+        addSigLine(KADIN_NIP);
+
+        // Column widths - disesuaikan (24 kolom)
+        worksheet.columns = [
+            { width: 5 }, { width: 25 }, { width: 25 }, { width: 25 }, { width: 30 }, // A-E
+            { width: 25 }, { width: 15 }, { width: 20 }, { width: 15 }, // F-I
+            { width: 15 }, { width: 10 }, { width: 12 }, { width: 12 }, { width: 12 }, // J-N
+            { width: 10 }, { width: 10 }, { width: 10 }, { width: 15 }, // O-R
+            { width: 15 }, { width: 12 }, { width: 20 }, { width: 15 }, { width: 15 }, { width: 30 } // S-X
+        ];
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = `Rekap_Data_PBG_${currentTahunFilter}.xlsx`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); window.URL.revokeObjectURL(url);
+    }
+
+    function getBase64ImageFromURL(url) {
+        return new Promise((resolve, reject) => {
+            var img = new Image(); img.setAttribute("crossOrigin", "anonymous");
+            img.onload = () => {
+                var canvas = document.createElement("canvas");
+                canvas.width = img.width; canvas.height = img.height;
+                var ctx = canvas.getContext("2d"); ctx.drawImage(img, 0, 0);
+                resolve(canvas.toDataURL("image/png"));
+            };
+            img.onerror = error => reject(error); img.src = url;
+        });
+    }
+
+    async function downloadPDF() {
+        Swal.fire({
+            title: 'Menyiapkan Laporan PDF...', text: 'Mohon tunggu...',
+            allowOutsideClick: false, background: '#0f172a', color: '#fff',
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        try {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape', 'mm', 'a3'); // A3 Landscape for max width
+            const logoUrl = 'https://upload.wikimedia.org/wikipedia/commons/1/10/Lambang_Kabupaten_Mimika.jpg';
+            
+            try {
+                const logoBase64 = await getBase64ImageFromURL(logoUrl);
+                doc.addImage(logoBase64, 'PNG', 40, 6, 22, 28);
+            } catch (e) { console.warn("Logo gagal dimuat."); }
+
+            // Header - Centered for A3 (Width is 420mm, Center is 210)
+            doc.setTextColor(0, 0, 0); doc.setFont("helvetica", "bold"); doc.setFontSize(15);
+            doc.text("PEMERINTAH KABUPATEN MIMIKA", 210, 15, { align: "center" });
+            doc.setFontSize(13); doc.text("DINAS PENANAMAN MODAL DAN PELAYANAN TERPADU SATU PINTU", 210, 22, { align: "center" });
+            doc.setFont("helvetica", "normal"); doc.setFontSize(9);
+            doc.text("Jl. Poros Kuala Kencana Pusat Pemerintahan Gedung D Lantai II", 210, 28, { align: "center" });
+            doc.text("Tlp. (0901) 3262943 Timika - Papua Pos 99910", 210, 33, { align: "center" });
+
+            doc.setDrawColor(0, 0, 0); doc.setLineWidth(1.0); doc.line(15, 37, 405, 37);
+            doc.setLineWidth(0.3); doc.line(15, 38.5, 405, 38.5);
+
+            doc.setFont("helvetica", "bold"); doc.setFontSize(11);
+            doc.text("REKAPITULASI DATA PERSETUJUAN BANGUNAN GEDUNG (PBG)", 210, 47, { align: "center" });
+            doc.setFontSize(9); doc.text(`TAHUN ${currentTahunFilter}`, 210, 52, { align: "center" });
+            
+            // Kolom THN dihapus
+            let tableHeaders = [
+                'NO', 'NO. PERMOHONAN', 'NO. SK PBG', 'PEMILIK', 'ALAMAT PEMILIK',
+                'BANGUNAN', 'GUNA BGN', 'FUNGSI', 'SUB FUNGSI',
+                'KLASIFIKASI', 'KELAS', 'L.TOTAL', 'L.LANTAI', 'L.BASEMEN',
+                'JML LT', 'T (m)', 'JML UNIT', 'LPS BASEMEN',
+                'STS TANAH', 'L.TANAH', 'PEMILIK TNH', 'KEL/DESA', 'DISTRIK', 'ALAMAT TANAH'
+            ];
+            
+            let tableBody = [];
+            if (dataPbgExport.length > 0) {
+                dataPbgExport.forEach((item, index) => {
+                    // item.Tahun dihapus dari push array
+                    tableBody.push([
+                        (index + 1).toString(),
+                        (item.NomorPermohonan || '-'),
+                        (item.NomorSkPbg || '-'),
+                        (item.NamaPemilikBangunan || '-'),
+                        (item.AlamatPemilikBangunan || '-'),
+                        (item.NamaBangunanGedung || '-'),
+                        (item.GunaBangunan || '-'),
+                        (item.FungsiBangunanGedung || '-'),
+                        (item.SubFungsiBangunanGedung || '-'),
+                        (item.KlasifikasiKompleksitas || '-'),
+                        (item.KelasBangunan || '-'),
+                        (item.TotalLuas || '-'),
+                        (item.LuasLantai || '-'),
+                        (item.LuasBasemen || '-'),
+                        (item.JumlahLantaiBangunan || '-'),
+                        (item.TinggiBangunanGedung || '-'),
+                        (item.JumlahUnitBangunan || '-'),
+                        (item.JumlahLapisBasemen || '-'),
+                        (item.DiatasTanah || '-'),
+                        (item.LuasTanah || '-'),
+                        (item.PemilikTanah || '-'),
+                        (item.KelurahanDesa || '-'),
+                        (item.Distrik || '-'),
+                        (item.AlamatTanah || '-')
+                    ]);
+                });
+            } else {
+                tableBody.push([{ content: 'Belum ada data PBG.', colSpan: 24, styles: { halign: 'center' } }]);
+            }
+
+            doc.autoTable({
+                startY: 57, head: [tableHeaders], body: tableBody, theme: 'grid',
+                headStyles: { fillColor: [146, 205, 220], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center', valign: 'middle', lineWidth: 0.2, lineColor: [0, 0, 0], fontSize: 5 },
+                bodyStyles: { textColor: [0, 0, 0], lineWidth: 0.2, lineColor: [0, 0, 0], fontSize: 5, valign: 'top', cellPadding: 1 },
+                margin: { top: 15, right: 10, bottom: 20, left: 10 }
+            });
+
+            const finalY = doc.lastAutoTable.finalY + 10;
+            const now = new Date();
+            const dateStr = `${now.getDate()} ${monthNamesIndo[now.getMonth()]} ${now.getFullYear()}`;
+            const rightMargin = 330; 
+
+            if (finalY > 260) doc.addPage();
+            let signY = finalY > 260 ? 20 : finalY;
+
+            doc.setFont("helvetica", "normal"); doc.setFontSize(9);
+            doc.text(`TIMIKA, ${dateStr}`, rightMargin, signY);
+            doc.text("Kepala Dinas,", rightMargin, signY + 5);
+            doc.text("Penanaman Modal dan Pelayanan Terpadu", rightMargin, signY + 10);
+            doc.text("Satu Pintu Kabupaten Mimika,", rightMargin, signY + 15);
+
+            const signatureY = signY + 38;
+            doc.setFont("helvetica", "bold"); 
+            doc.text(KADIN_NAMA, rightMargin, signatureY);
+            doc.setFont("helvetica", "normal");
+            doc.text(KADIN_PANGKAT, rightMargin, signatureY + 5);
+            doc.text(KADIN_NIP, rightMargin, signatureY + 10);
+
+            doc.save(`Rekap_Data_PBG_${currentTahunFilter}.pdf`);
+            Swal.close();
+        } catch (error) {
+            console.error(error);
+            Swal.fire({icon: 'error', title: 'Gagal', text: 'Sistem gagal membuat PDF.', background: '#0f172a', color: '#fff'});
+        }
+    }
+
     function openModal() {
         $('#formPbg')[0].reset();
         $('#pbg_id').val('');
+        $('#Tahun').val(currentTahunFilter); // Default to current filter year
         $('#modalTitle').html('<i data-lucide="file-plus" class="w-4 h-4 text-teal-400"></i> Tambah Data PBG');
         $('#modalPbg').removeClass('hidden');
         lucide.createIcons();

@@ -275,15 +275,23 @@ class SINTAMIKA extends CI_Controller {
             $password = $this->input->post('password', TRUE);
 
             // Cari user di database berdasarkan username
-            $this->db->where('username', $username);
+            $this->db->where('Username', $username); // Disesuaikan kapitalisasi foldernya jika perlu
             $query = $this->db->get('AkunAdmin');
             $user = $query->row();
             // Verifikasi user ada dan password cocok dengan hash di database
-            if ($user->Username == $username && password_verify($password, $user->Password)) {
-                // Set Session
+            if ($user && $user->Username == $username && password_verify($password, $user->Password)) {
+                
+                // Ambil data Kepala Dinas yang aktif (misal berdasarkan status atau record terakhir/teratas)
+                $this->db->order_by('id', 'DESC');
+                $kadin = $this->db->get('KepalaDinas')->row();
+
+                // Set Session termasuk data Kepala Dinas
                 $session_data = array(
                     'admin_username'  => $user->Username,
-                    'admin_logged_in' => TRUE
+                    'admin_logged_in' => TRUE,
+                    'kadin_nama'      => ($kadin) ? $kadin->Nama : 'Marselino Mameyao, SKM',
+                    'kadin_pangkat'   => ($kadin) ? $kadin->Pangkat : 'Pembina TK. I',
+                    'kadin_nip'       => ($kadin) ? $kadin->NIP : '196805141989111002'
                 );
                 $this->session->set_userdata($session_data);
 
